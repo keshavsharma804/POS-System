@@ -1,0 +1,332 @@
+[2025-06-03 19:46:34] No valid remember cookie found
+[2025-06-03 19:47:07] No valid remember cookie found
+[2025-06-03 20:25:36] Client login attempt: username=client1
+[2025-06-03 20:25:37] Client login successful: user_id=2, username=client1
+[2025-06-03 20:25:37] Remember me token set for user_id=2
+[2025-06-03 20:53:09] Client login attempt: username=client1
+[2025-06-03 20:53:09] Client login successful: user_id=2, username=client1
+[2025-06-03 21:13:31] Admin login attempt: username=admin1
+[2025-06-03 21:13:31] Error: Invalid username or password for username=admin1
+[2025-06-03 21:13:45] Admin login attempt: username=admin1
+[2025-06-03 21:13:45] Error: Invalid username or password for username=admin1
+[2025-06-03 21:17:49] Admin login attempt: username=admin
+[2025-06-03 21:17:49] Error: Invalid username or password for username=admin
+[2025-06-03 21:18:11] Admin login attempt: username=admin1
+[2025-06-03 21:18:11] Error: Invalid username or password for username=admin1
+[2025-06-03 21:43:36] Admin login attempt: username=admin
+[2025-06-03 21:43:36] Error: Invalid username or password for username=admin
+[2025-06-03 21:44:03] Admin login attempt: username=admin1
+[2025-06-03 21:44:03] Error: Invalid username or password for username=admin1
+[2025-06-03 21:44:14] Admin login attempt: username=admin1
+[2025-06-03 21:44:14] Error: Invalid username or password for username=admin1
+[2025-06-03 21:45:50] Client login attempt: username=client1
+[2025-06-03 21:45:50] Client login successful: user_id=2, username=client1
+[2025-06-03 21:49:34] Admin login attempt: username=admin1
+[2025-06-03 21:49:34] Error: Invalid username or password for username=admin1
+[2025-06-03 21:49:44] Admin login attempt: username=admin1
+[2025-06-03 21:49:44] Error: Invalid username or password for username=admin1
+[2025-06-03 21:51:25] Password reset for admin1, user_id=5
+[2025-06-03 21:52:25] Admin login attempt: username=admin1
+[2025-06-03 21:52:25] Admin login successful: user_id=5, username=admin1
+[2025-06-03 22:17:07] Auto-login via cookie: user_id=2, role=client
+[2025-06-03 22:17:16] Auto-login via cookie: user_id=2, role=client
+[2025-06-03 22:17:23] Invalid or expired remember_client cookie: token=067dac1a374415dae4bf65ddfe9d4d88fa97fb6aa0367888522c6d07bcd84914
+[2025-06-03 22:17:39] client login attempt: username=admin1
+[2025-06-03 22:17:39] Error: Invalid username or password for username=admin1, role=client
+[2025-06-03 22:18:12] admin login attempt: username=admin1
+[2025-06-03 22:18:12] admin login successful: user_id=5, username=admin1
+[2025-06-03 22:18:34] client login attempt: username=client1
+[2025-06-03 22:18:34] client login successful: user_id=2, username=client1
+[2025-06-03 22:20:48] CSRF token validation failed: provided=81812a6296a960e763eb833f9e7ee0aea0c54b773d294fe9c3eeb9ecca92c333, expected=9f98245baee993bfd26776eca03dabb7b1448076eee5b7daeb16ce5934b08a31
+[2025-06-03 22:20:52] CSRF token validation failed: provided=81812a6296a960e763eb833f9e7ee0aea0c54b773d294fe9c3eeb9ecca92c333, expected=9f98245baee993bfd26776eca03dabb7b1448076eee5b7daeb16ce5934b08a31
+[2025-06-03 22:39:54] Admin login attempt: username=admin1
+[2025-06-03 22:39:54] Admin login successful: user_id=5, username=admin1
+[2025-06-03 22:41:41] Client login attempt: username=client1
+[2025-06-03 22:41:42] Client login successful: user_id=2, username=client1
+[2025-06-03 22:42:14] CSRF token validation failed: provided=9f98245baee993bfd26776eca03dabb7b1448076eee5b7daeb16ce5934b08a31, expected=6149204bd40b707ab32c3fbfdb9bc4904355ded7b9e3fc187433929b5d7e3614
+[2025-06-03 22:42:18] CSRF token validation failed: provided=9f98245baee993bfd26776eca03dabb7b1448076eee5b7daeb16ce5934b08a31, expected=6149204bd40b707ab32c3fbfdb9bc4904355ded7b9e3fc187433929b5d7e3614
+[2025-06-03 22:42:22] CSRF token validation failed: provided=9f98245baee993bfd26776eca03dabb7b1448076eee5b7daeb16ce5934b08a31, expected=6149204bd40b707ab32c3fbfdb9bc4904355ded7b9e3fc187433929b5d7e3614
+[2025-06-03 22:42:23] CSRF token validation failed: provided=9f98245baee993bfd26776eca03dabb7b1448076eee5b7daeb16ce5934b08a31, expected=6149204bd40b707ab32c3fbfdb9bc4904355ded7b9e3fc187433929b5d7e3614
+[2025-06-03 22:42:23] CSRF token validation failed: provided=9f98245baee993bfd26776eca03dabb7b1448076eee5b7daeb16ce5934b08a31, expected=6149204bd40b707ab32c3fbfdb9bc4904355ded7b9e3fc187433929b5d7e3614
+[2025-06-03 22:42:23] CSRF token validation failed: provided=9f98245baee993bfd26776eca03dabb7b1448076eee5b7daeb16ce5934b08a31, expected=6149204bd40b707ab32c3fbfdb9bc4904355ded7b9e3fc187433929b5d7e3614
+[2025-06-03 22:49:52] Admin login attempt: username=admin1
+[2025-06-03 22:49:52] Admin login successful: user_id=5, username=admin1
+[2025-06-03 22:50:19] Regenerated CSRF token: 78c53c277cd870afd32413e21c3f0d620f0790a57c6c86b9574d2ed66ce3d06e
+[2025-06-03 22:50:22] Regenerated CSRF token: cf87e4796d9a264477058c3d6749d6fc005df89e8252837b2170e41474818ce8
+[2025-06-03 22:50:34] Regenerated CSRF token: e76ddc46f95d3b6d15bcc953ae9101bfe3afe9986d7c66ca88786ea47d06307e
+[2025-06-03 22:50:35] Regenerated CSRF token: dac4cbb8919f2345933af15f5d0af0142db7196e0335ceeec94e97022eafd7ed
+[2025-06-03 22:50:41] Regenerated CSRF token: 32d5ef863ca6def8c61e4d5e117dc8f098c5120a2b819bc67f235889c1f34b5f
+[2025-06-03 22:50:43] Regenerated CSRF token: a7a5d89115eae1ff35512b30de0cc9bccbb5fcfabb15c5380bc5f8722e8180c2
+[2025-06-03 22:51:16] Client login attempt: username=client1
+[2025-06-03 22:51:16] Client login successful: user_id=2, username=client1
+[2025-06-03 22:51:35] Regenerated CSRF token: 5c863f896727eba728370fbf52edbfe8192fbba7b628ae905321f19060dc0759
+[2025-06-03 22:51:35] Regenerated CSRF token: 8a6ab1508a063b8738049ce65787344df87c0cff2fef74a96a95e4242274c9bf
+[2025-06-03 22:51:35] Regenerated CSRF token: eaf0039144901a0a0b44e6e79c7e0b03948d205a8334d67bffd05be5dea2f3fa
+[2025-06-03 22:51:51] Regenerated CSRF token: 402f4ca54205a02fa8192c166cf7f155ae0965706c37ce19f3118739a24d4e41
+[2025-06-03 22:51:51] Regenerated CSRF token: c18c5e2e39357c30d2f181f2ad9f5bccfa01dcd2dc242e5b721f1c524186dfb6
+[2025-06-03 22:51:51] Regenerated CSRF token: f0e58cce42fad5bd5bccaeaa7b1a02311f2a771c0f5a53893fa1ff5d6334ae65
+[2025-06-03 22:52:02] Regenerated CSRF token: bffb0dd576a032a3513852cef27c320daf507acf4d241aa1e6345cc94738fc14
+[2025-06-03 22:52:02] Regenerated CSRF token: 19b8cfb82be4943b38f51fb2dc949d385a676261af0858bbf67276ce2ec2d9a2
+[2025-06-03 22:52:02] Regenerated CSRF token: 3f766eca09c61e203a06365e40ac40493de894659da9de8545ca851dbdb5bc9a
+[2025-06-03 22:53:53] Admin login attempt: username=admin1
+[2025-06-03 22:53:53] Admin login successful: user_id=5, username=admin1
+[2025-06-03 23:00:51] Admin login attempt: username=admin1
+[2025-06-03 23:00:51] Admin login successful: user_id=5, username=admin1
+[2025-06-03 23:01:25] Set low stock threshold to 10
+[2025-06-03 23:01:25] Regenerated CSRF token: 7e8bcb1a2a1e79e94a65783baa36d228ace292f3b9a55dcbac68d1746037988f
+[2025-06-03 23:01:27] Regenerated CSRF token: 8176ae88c80c4fc26e3779aca6ee82e66b7812495a8625faa753aa56ec9a9f77
+[2025-06-03 23:01:34] Set low stock threshold to 10
+[2025-06-03 23:01:34] Regenerated CSRF token: 01ecb4cda5f553a928a1e98b327e1f6bb48646048ca351dad17ce71e1ad11141
+[2025-06-03 23:01:36] Regenerated CSRF token: 2f9bb3e9bdfba7edbe800403d94a587998b2a91c094f2ffcf5f16cf040cb0cd2
+[2025-06-03 23:02:08] Set low stock threshold to 20
+[2025-06-03 23:02:08] Regenerated CSRF token: a65c074cf89b62e101c5f7e24265fd7e7f745198558181995e7b8cd3cac6fb80
+[2025-06-03 23:02:09] Regenerated CSRF token: 1b60479e84e946d6e2fc5f0a7f562cfac87f5e730faf82b2586b8a828cce63e6
+[2025-06-03 23:03:11] Regenerated CSRF token: 9a2010d019ed7c485599952f4a37ac81439296306c89b6870d23aa148f48ba9f
+[2025-06-03 23:03:13] Regenerated CSRF token: 58b4c83f810827a17d069a4b5a32b5ce0acd1c004b448ba09e69d5c8089af27a
+[2025-06-03 23:03:15] Regenerated CSRF token: 232187aa8998e2e3eda34d6ad1eb6491e2ea541cc76af0cebee6c011bd7e5534
+[2025-06-03 23:03:16] Regenerated CSRF token: 3326d7b9e24f3828c6139a9b099be2478918ca138db4112c14e826b3fb0c7be2
+[2025-06-03 23:03:19] Regenerated CSRF token: b432707fc2a013ba8461e938c8e3c78d244a72b71a08dfb4698bdde305ee0f0c
+[2025-06-03 23:03:20] Regenerated CSRF token: 6588fab7908cd2477472d102f0b11544650ab4c36840dacb78c413e76684af71
+[2025-06-03 23:03:30] Regenerated CSRF token: 15d40357c04d8e9b2869cba3db6f1e773d4ac43c82bb4fd6a6fd63588e8c3ee7
+[2025-06-03 23:03:31] Regenerated CSRF token: 4b8af0d35048c5a4d833781c88de5c6f26021fa05178e6adf3cb05b4941db95e
+[2025-06-03 23:03:40] Regenerated CSRF token: 8d2157912fa51a0a588abab2e99477ca0f3d2fdc28c84cc814c10d6862d9c767
+[2025-06-03 23:03:42] Regenerated CSRF token: a590a9481bb7c2d5680ef96c99ecdbfd5b8115b732ca3aeb02ebd834c543f628
+[2025-06-03 23:03:46] Set low stock threshold to 10
+[2025-06-03 23:03:46] Regenerated CSRF token: 36d43e33e7a4007446621bfbc84b6e900d06ef8cf7df1db8104e2e44407a92e8
+[2025-06-03 23:03:48] Regenerated CSRF token: 9b17f795d5894658a81acabbdc4ad9b8d80d7bc695df74ca05ce9a4e7637025b
+[2025-06-03 23:05:56] Set low stock threshold to 10
+[2025-06-03 23:05:56] Regenerated CSRF token: a4c778a5eae2474a8d3b43752d498d6f643c1b4fb149b8d7337b9fbd05815433
+[2025-06-03 23:05:57] Regenerated CSRF token: 74cff4d9f0360d42d2655277809b2ff39fc785b3324bbc3a2247f575db8c7b29
+[2025-06-03 23:08:50] Regenerated CSRF token: d8583e1d8b3320d6ac949c6b26127c6a54d0f970b3d90e7c0a44f34849fac03f
+[2025-06-03 23:08:52] Regenerated CSRF token: a146ccb5b817ade7b6cc2747b036223d87457ee9e62b700e8d12653002dbb38d
+[2025-06-03 23:16:34] admin login attempt: username=admin1
+[2025-06-03 23:16:34] admin login successful: user_id=5, username=admin1
+[2025-06-03 23:38:38] Set low stock threshold to 50
+[2025-06-03 23:38:38] Regenerated CSRF token: 41548416ae49bd2edfdd5951286731b36c4ca6e200f02f84f39c9e9d5ec37a8c
+[2025-06-03 23:38:40] Regenerated CSRF token: bfdbfaf4fdff98bd407cd757a82afbf3fe5385d2ba85654efd718597ddb7f34e
+[2025-06-03 23:38:58] Set low stock threshold to 11
+[2025-06-03 23:38:58] Regenerated CSRF token: 352fc9d045ec522f9efc7ffdad7d1f69988bd7c6edc5579a1311246cbb11f828
+[2025-06-03 23:39:00] Regenerated CSRF token: 956690154d19ad34b02bb5695954c61d0cd3368714bbc9732c5a08f394ae3ac2
+[2025-06-03 23:39:15] Set low stock threshold to 20
+[2025-06-03 23:39:15] Regenerated CSRF token: 904922647d5a32c74b134ffdee8ec6b13663357504cba4e31f747fc413284db1
+[2025-06-03 23:39:16] Regenerated CSRF token: 481421b31ab86a0edf988e22d607662e6d59f64ae4cf6136a18ed62be9c237be
+[2025-06-04 00:02:18] Client login attempt: username=client1
+[2025-06-04 00:02:18] Client login successful: user_id=2, username=client1
+[2025-06-04 00:02:30] Regenerated CSRF token: 52a54ca46ee2b4c6d59b89254a4173a5ed4aff947840fcf944496cdb85f49965
+[2025-06-04 00:02:30] Regenerated CSRF token: 29b894188ed1361496d321bf193f8755ed0623d841790d354cd144c307eacb95
+[2025-06-04 00:09:49] Client login attempt: username=client1
+[2025-06-04 00:09:49] Client login successful: user_id=2, username=client1
+[2025-06-04 00:10:20] Regenerated CSRF token: 2366e3be48340e0e02330144c0f00490dda08490ebf7a4f3d447a98140b28556
+[2025-06-04 00:10:21] Regenerated CSRF token: d9345bfd5c2a8cc1191957ea8f800a09dafc2088362cb6d7f3f6949912859bce
+[2025-06-04 00:10:47] Regenerated CSRF token: 1267a66b28b583dfcb10716c206a2e750c76ddddf4d16da65ff63127058d617a
+[2025-06-04 00:10:48] Regenerated CSRF token: ac2cb9671c05405abc259ca5bb41d43d52032e0de8402ebd52be01ae6902b8a8
+[2025-06-04 00:11:41] Regenerated CSRF token: bd390475c7cd9bb4f6fe97826399131b07778f15318a2bc16400dc6c312ed799
+[2025-06-04 00:11:41] Regenerated CSRF token: c8dbd25d666baaaaff446d37091ca020cfa8d63e092f40d0be55fcd594f49ad5
+[2025-06-04 01:15:29] admin login attempt: username=admin1
+[2025-06-04 01:15:29] admin login successful: user_id=5, username=admin1
+[2025-06-04 01:25:34] Client login attempt: username=client
+[2025-06-04 01:25:34] Error: Invalid username or password for username=client
+[2025-06-04 01:26:09] Client login attempt: username=client1
+[2025-06-04 01:26:09] Client login successful: user_id=2, username=client1
+[2025-06-04 01:28:04] Client login attempt: username=client1
+[2025-06-04 01:28:04] Client login successful: user_id=2, username=client1
+[2025-06-04 01:28:30] Client login attempt: username=client1
+[2025-06-04 01:28:30] Client login successful: user_id=2, username=client1
+[2025-06-04 01:35:02] Client login attempt: username=client1
+[2025-06-04 01:35:02] Client login successful: user_id=2, username=client1
+[2025-06-04 01:42:19] Client login attempt: username=client1
+[2025-06-04 01:42:19] Session role set: client
+[2025-06-04 01:42:19] Client login successful: user_id=2, username=client1
+[2025-06-04 01:44:02] Client login attempt: username=client1
+[2025-06-04 01:44:02] Session role set: client
+[2025-06-04 01:44:02] Client login successful: user_id=2, username=client1
+[2025-06-04 01:44:02] Remember me token set for user_id=2
+[2025-06-04 02:30:38] Cleared remember_client cookie
+[2025-06-04 02:30:38] Cleared remember tokens for user_id: 2
+[2025-06-04 02:30:38] User logged out, user_id: 2
+[2025-06-04 02:30:52] Client login attempt: username=client1
+[2025-06-04 02:30:53] Session role set: client
+[2025-06-04 02:30:53] Client login successful: user_id=2, username=client1
+[2025-06-04 02:33:03] Admin login attempt: username=admin1
+[2025-06-04 02:33:03] Admin login successful: user_id=5, username=admin1
+[2025-06-04 02:35:33] Client login attempt: username=client1
+[2025-06-04 02:35:33] Session role set: client
+[2025-06-04 02:35:33] Client login successful: user_id=2, username=client1
+[2025-06-04 02:36:13] Admin login attempt: username=admin1
+[2025-06-04 02:36:13] Admin login successful: user_id=5, username=admin1
+[2025-06-04 02:37:01] Cleared remember tokens for user_id: 5
+[2025-06-04 02:37:01] User logged out, user_id: 5
+[2025-06-04 02:37:11] Client login attempt: username=client1
+[2025-06-04 02:37:11] Session role set: client
+[2025-06-04 02:37:11] Client login successful: user_id=2, username=client1
+[2025-06-04 02:37:59] Admin login attempt: username=admin1
+[2025-06-04 02:37:59] Admin login successful: user_id=5, username=admin1
+[2025-06-04 02:39:04] Cleared remember tokens for user_id: 5
+[2025-06-04 02:39:04] User logged out, user_id: 5
+[2025-06-04 02:39:16] Client login attempt: username=client1
+[2025-06-04 02:39:16] Session role set: client
+[2025-06-04 02:39:16] Client login successful: user_id=2, username=client1
+[2025-06-04 02:39:55] Admin login attempt: username=admin1
+[2025-06-04 02:39:55] Admin login successful: user_id=5, username=admin1
+[2025-06-04 02:40:30] Cleared remember tokens for user_id: 5
+[2025-06-04 02:40:30] User logged out, user_id: 5
+[2025-06-04 02:40:40] Client login attempt: username=client1
+[2025-06-04 02:40:40] Session role set: client
+[2025-06-04 02:40:40] Client login successful: user_id=2, username=client1
+[2025-06-04 02:41:24] Admin login attempt: username=admin1
+[2025-06-04 02:41:24] Admin login successful: user_id=5, username=admin1
+[2025-06-04 02:42:54] Cleared remember tokens for user_id: 5
+[2025-06-04 02:42:54] User logged out, user_id: 5
+[2025-06-04 02:43:02] Client login attempt: username=client1
+[2025-06-04 02:43:02] Session role set: client
+[2025-06-04 02:43:02] Client login successful: user_id=2, username=client1
+[2025-06-04 02:43:06] Cleared remember tokens for user_id: 2
+[2025-06-04 02:43:06] User logged out, user_id: 2
+[2025-06-04 02:43:26] Cleared remember tokens for user_id: unknown
+[2025-06-04 02:43:26] User logged out, user_id: unknown
+[2025-06-04 02:43:37] Client login attempt: username=client1
+[2025-06-04 02:43:37] Session role set: client
+[2025-06-04 02:43:37] Client login successful: user_id=2, username=client1
+[2025-06-04 02:44:49] Error: Invalid CSRF token in client login
+[2025-06-04 02:45:00] Client login attempt: username=admin1
+[2025-06-04 02:45:00] Error: Invalid username or password for username=admin1
+[2025-06-04 02:45:31] Admin login attempt: username=admin1
+[2025-06-04 02:45:31] Admin login successful: user_id=5, username=admin1
+[2025-06-04 03:11:09] Client login attempt: username=client1
+[2025-06-04 03:11:09] Session role set: client
+[2025-06-04 03:11:09] Client login successful: user_id=2, username=client1
+[2025-06-04 03:26:04] Cleared remember tokens for user_id: 2
+[2025-06-04 03:26:04] User logged out, user_id: 2
+[2025-06-04 03:26:14] Client login attempt: username=client1
+[2025-06-04 03:26:14] Session role set: client
+[2025-06-04 03:26:14] Client login successful: user_id=2, username=client1
+[2025-06-04 03:27:10] Admin login attempt: username=admin1
+[2025-06-04 03:27:10] Admin login successful: user_id=5, username=admin1
+[2025-06-04 03:53:30] Cleared remember tokens for user_id: 5
+[2025-06-04 03:53:30] User logged out, user_id: 5
+[2025-06-04 03:53:52] Admin login attempt: username=admin1
+[2025-06-04 03:53:52] Admin login successful: user_id=5, username=admin1
+[2025-06-04 04:05:31] Client login attempt: username=client1
+[2025-06-04 04:05:31] Session role set: client
+[2025-06-04 04:05:31] Client login successful: user_id=2, username=client1
+[2025-06-04 04:12:23] Admin login attempt: username=admin
+[2025-06-04 04:12:23] Error: Invalid username or password for username=admin
+[2025-06-04 04:12:40] Admin login attempt: username=admin1
+[2025-06-04 04:12:40] Admin login successful: user_id=5, username=admin1
+[2025-06-04 04:22:40] Cleared remember tokens for user_id: 5
+[2025-06-04 04:22:40] User logged out, user_id: 5
+[2025-06-04 04:22:49] Client login attempt: username=admin1
+[2025-06-04 04:22:49] Error: Invalid username or password for username=admin1
+[2025-06-04 04:23:03] Client login attempt: username=admin1
+[2025-06-04 04:23:03] Error: Invalid username or password for username=admin1
+[2025-06-04 04:23:19] Client login attempt: username=admin1
+[2025-06-04 04:23:19] Error: Invalid username or password for username=admin1
+[2025-06-04 04:23:50] Admin login attempt: username=admin1
+[2025-06-04 04:23:50] Admin login successful: user_id=5, username=admin1
+[2025-06-04 04:37:19] Error: Invalid CSRF token in client login
+[2025-06-04 04:37:41] Client login attempt: username=client1
+[2025-06-04 04:37:41] Session role set: client
+[2025-06-04 04:37:41] Client login successful: user_id=2, username=client1
+[2025-06-04 04:53:22] Cleared remember tokens for user_id: 2
+[2025-06-04 04:53:22] User logged out, user_id: 2
+[2025-06-04 04:53:31] Client login attempt: username=client1
+[2025-06-04 04:53:31] Session role set: client
+[2025-06-04 04:53:31] Client login successful: user_id=2, username=client1
+[2025-06-04 05:06:54] Cleared remember tokens for user_id: 2
+[2025-06-04 05:06:54] User logged out, user_id: 2
+[2025-06-04 05:07:06] Client login attempt: username=client1
+[2025-06-04 05:07:06] Session role set: client
+[2025-06-04 05:07:06] Client login successful: user_id=2, username=client1
+[2025-06-04 14:15:31] Admin login attempt: username=admin1
+[2025-06-04 14:15:31] Admin login successful: user_id=5, username=admin1
+[2025-06-04 14:16:03] Client login attempt: username=client1
+[2025-06-04 14:16:03] Session role set: client
+[2025-06-04 14:16:03] Client login successful: user_id=2, username=client1
+[2025-06-04 15:13:43] admin login attempt: username=admin1
+[2025-06-04 15:13:43] admin login successful: user_id=5, username=admin1
+[2025-06-04 15:16:32] Cleared remember tokens for user_id: 5
+[2025-06-04 15:16:32] User logged out, user_id: 5
+[2025-06-04 15:19:03] admin login attempt: username=admin1
+[2025-06-04 15:19:03] admin login successful: user_id=5, username=admin1
+[2025-06-04 15:19:44] Cleared remember tokens for user_id: 5
+[2025-06-04 15:19:44] User logged out, user_id: 5
+[2025-06-04 15:19:53] Cleared remember tokens for user_id: unknown
+[2025-06-04 15:19:53] User logged out, user_id: unknown
+[2025-06-04 15:22:39] Admin login attempt: username=admin1
+[2025-06-04 15:22:40] Admin login successful: user_id=5, username=admin1
+[2025-06-04 15:54:28] Cleared remember tokens for user_id: 5
+[2025-06-04 15:54:28] User logged out, user_id: 5
+[2025-06-04 15:55:34] Admin login attempt: username=admin1
+[2025-06-04 15:55:34] Admin login successful: user_id=5, username=admin1
+[2025-06-04 16:19:49] Cleared remember tokens for user_id: 5
+[2025-06-04 16:19:49] User logged out, user_id: 5
+[2025-06-04 16:20:04] Admin login attempt: username=admin1
+[2025-06-04 16:20:04] Admin login successful: user_id=5, username=admin1
+[2025-06-04 19:17:17] Cleared remember tokens for user_id: 5
+[2025-06-04 19:17:17] User logged out, user_id: 5
+[2025-06-04 19:18:54] admin login attempt: username=admin1
+[2025-06-04 19:18:54] admin login successful: user_id=5, username=admin1
+[2025-06-04 19:18:54] Remember me token set for user_id=5
+[2025-06-04 19:27:15] Cleared remember_admin cookie
+[2025-06-04 19:27:15] Cleared remember tokens for user_id: 5
+[2025-06-04 19:27:15] User logged out, user_id: 5
+[2025-06-04 19:27:50] Client login attempt: username=admin1
+[2025-06-04 19:27:50] Error: Invalid username or password for username=admin1
+[2025-06-04 19:28:02] Admin login attempt: username=admin1
+[2025-06-04 19:28:02] Admin login successful: user_id=5, username=admin1
+[2025-06-04 20:47:06] Cleared remember tokens for user_id: 5
+[2025-06-04 20:47:06] User logged out, user_id: 5
+[2025-06-04 20:47:18] Client login attempt: username=admin1
+[2025-06-04 20:47:18] Error: Invalid username or password for username=admin1
+[2025-06-04 20:47:32] Admin login attempt: username=admin1
+[2025-06-04 20:47:32] Admin login successful: user_id=5, username=admin1
+[2025-06-04 20:49:03] Cleared remember tokens for user_id: 5
+[2025-06-04 20:49:03] User logged out, user_id: 5
+[2025-06-04 20:49:15] Client login attempt: username=admin1
+[2025-06-04 20:49:15] Error: Invalid username or password for username=admin1
+[2025-06-04 20:49:40] admin login attempt: username=admin1
+[2025-06-04 20:49:40] admin login successful: user_id=5, username=admin1
+[2025-06-04 21:44:44] Cleared remember tokens for user_id: 5
+[2025-06-04 21:44:44] User logged out, user_id: 5
+[2025-06-04 21:46:04] Admin login attempt: username=admin1
+[2025-06-04 21:46:04] Admin login successful: user_id=5, username=admin1
+[2025-06-05 00:03:18] Cleared remember tokens for user_id: 5
+[2025-06-05 00:03:18] User logged out, user_id: 5
+[2025-06-05 00:03:36] Admin login attempt: username=admin1
+[2025-06-05 00:03:36] Admin login successful: user_id=5, username=admin1
+[2025-06-05 01:07:11] Cleared remember tokens for user_id: 5
+[2025-06-05 01:07:11] User logged out, user_id: 5
+[2025-06-05 01:07:25] Admin login attempt: username=admin1
+[2025-06-05 01:07:25] Admin login successful: user_id=5, username=admin1
+[2025-06-05 02:12:10] Admin login attempt: username=admin1
+[2025-06-05 02:12:10] Admin login successful: user_id=5, username=admin1
+[2025-06-05 02:57:00] Client login attempt: username=client1
+[2025-06-05 02:57:00] Session role set: client
+[2025-06-05 02:57:00] Client login successful: user_id=2, username=client1
+[2025-06-05 04:07:16] admin login attempt: username=admin1
+[2025-06-05 04:07:16] admin login successful: user_id=5, username=admin1
+[2025-06-05 11:46:00] admin login attempt: username=admin1
+[2025-06-05 11:46:00] admin login successful: user_id=5, username=admin1
+[2025-06-05 11:46:00] Remember me token set for user_id=5
+[2025-06-05 13:58:55] Cleared remember_admin cookie
+[2025-06-05 13:58:55] Cleared remember tokens for user_id: 5
+[2025-06-05 13:58:55] User logged out, user_id: 5
+[2025-06-05 13:59:09] Admin login attempt: username=ADadmin1
+[2025-06-05 13:59:09] Error: Invalid username or password for username=ADadmin1
+[2025-06-05 13:59:23] Admin login attempt: username=admin1
+[2025-06-05 13:59:23] Admin login successful: user_id=5, username=admin1
+[2025-06-05 15:18:38] Client login attempt: username=client1
+[2025-06-05 15:18:38] Session role set: client
+[2025-06-05 15:18:38] Client login successful: user_id=2, username=client1
+[2025-06-05 20:01:19] admin login attempt: username=admin1
+[2025-06-05 20:01:19] admin login successful: user_id=5, username=admin1
+[2025-06-05 20:01:19] Remember me token set for user_id=5
+[2025-06-05 20:36:37] Client login attempt: username=client1
+[2025-06-05 20:36:37] Session role set: client
+[2025-06-05 20:36:37] Client login successful: user_id=2, username=client1
+[2025-06-09 12:11:33] admin login attempt: username=admin
+[2025-06-09 12:11:33] Database error in login: SQLSTATE[42S02]: Base table or view not found: 1932 Table 'pos_demo.users' doesn't exist in engine
+[2025-06-09 12:11:46] admin login attempt: username=admin
+[2025-06-09 12:11:46] Database error in login: SQLSTATE[42S02]: Base table or view not found: 1932 Table 'pos_demo.users' doesn't exist in engine
+[2025-06-09 12:55:04] admin login attempt: username=admin1
+[2025-06-09 12:55:04] admin login successful: user_id=5, username=admin1
