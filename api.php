@@ -6,13 +6,27 @@ header('Content-Type: application/json');
 require 'config.php';
 require 'vendor/autoload.php'; // TCPDF
 
+
+
+
+function sendJsonResponse($statusCode, $data) {
+    http_response_code($statusCode);
+    header('Content-Type: application/json');
+    echo json_encode($data);
+    exit;
+}
+
+
 // Process image upload
 function processImageUpload($file, $product_id) {
     $uploadDir = __DIR__ . '/Uploads/';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
     $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
     $maxSize = 2 * 1024 * 1024; // 2MB
     if ($file['error'] !== UPLOAD_ERR_OK) {
-        return ['status' => 'error', 'message' => 'File upload error'];
+        return ['status' => 'error', 'message' => 'File upload error: ' . $file['error']];
     }
     if (!in_array($file['type'], $allowedTypes)) {
         return ['status' => 'error', 'message' => 'Invalid file type. Only JPEG, PNG, GIF allowed'];
@@ -26,8 +40,11 @@ function processImageUpload($file, $product_id) {
     if (!move_uploaded_file($file['tmp_name'], $destination)) {
         return ['status' => 'error', 'message' => 'Failed to save file'];
     }
-    return ['status' => 'success', 'filename' => $filename];
+    $relativePath = 'Uploads/' . $filename;
+    return ['status' => 'success', 'filename' => $relativePath];
 }
+
+
 
 // Determine the action based on request method and content type
 $action = '';
@@ -55,7 +72,7 @@ if (empty($action)) {
 
 debugLog("Action requested: $action", 'api_debug.log');
 
-if (in_array($action, ['add_product', 'delete_product', 'edit_product','update_product', 'add_discount', 'delete_discount', 'update_discount', 'get_sales_summary', 'export_products_csv', 'import_products_csv', 'export_sales_csv', 'get_low_stock_products', 'set_low_stock_threshold', 'get_sales_report', 'export_sales_report_csv', 'generate_invoice', 'checkout', 'get_sales', 'search_clients', 'get_detailed_sales_report', 'generate_sales_report_pdf', 'generate_receipt'])) {
+if (in_array($action, ['add_product', 'delete_product', 'edit_product', 'update_product', 'add_discount', 'delete_discount', 'update_discount', 'get_sales_summary', 'export_products_csv', 'import_products_csv', 'export_sales_csv', 'get_low_stock_products', 'set_low_stock_threshold', 'get_sales_report', 'export_sales_report_csv', 'generate_invoice', 'checkout', 'get_sales', 'search_clients', 'get_detailed_sales_report', 'generate_sales_report_pdf', 'generate_receipt', 'get_sales_forecast', 'get_customer_detailed_history', 'generate_customer_history_pdf', 'update_customer', 'delete_customer', 'export_stock_adjustments_csv', 'get_product_catalog', 'add_to_cart', 'get_cart_contents', 'update_cart_item', 'remove_from_cart', 'upload_product_image'])) {
     if (!isAdmin() && !isClient()) {
         debugLog("Unauthorized access for action: $action", 'api_debug.log');
         echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
@@ -63,7 +80,7 @@ if (in_array($action, ['add_product', 'delete_product', 'edit_product','update_p
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['add_product', 'edit_product', 'add_discount', 'delete_discount', 'delete_product', 'update_discount', 'update_product', 'process_sale', 'import_products_csv', 'set_low_stock_threshold', 'generate_invoice', 'checkout', 'search_products', 'generate_sales_report_pdf', 'generate_receipt', 'get_most_sold_products', 'export_most_sold_products_csv', 'get_dashboard_summary', 'get_daily_sales_trend'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['add_product', 'edit_product', 'add_discount', 'delete_discount', 'delete_product', 'update_discount', 'update_product', 'import_products_csv', 'set_low_stock_threshold', 'generate_invoice', 'checkout', 'search_products', 'generate_sales_report_pdf', 'generate_receipt', 'get_most_sold_products', 'export_most_sold_products_csv', 'get_dashboard_summary', 'get_daily_sales_trend', 'get_customer_detailed_history', 'generate_customer_history_pdf', 'update_customer', 'delete_customer', 'add_to_cart', 'update_cart_item', 'remove_from_cart', 'upload_product_image'])) {
     $csrf_token = $data['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
     if (!validateCsrfToken($csrf_token)) {
         debugLog("Invalid CSRF token for action: $action, provided: $csrf_token", 'api_debug.log');
@@ -80,38 +97,47 @@ switch ($action) {
         echo json_encode(['csrf_token' => $new_token]);
         break;
 
-    case 'search_clients':
-        if (!isAdmin()) {
-            debugLog("Unauthorized access to search_clients by non-admin", 'api_debug.log');
-            echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
-            exit;
-        }
-        $username = trim($_GET['username'] ?? '');
-        try {
-            $stmt = $pdo->prepare("SELECT id, username FROM users WHERE username LIKE ? AND role = 'client'");
-            $stmt->execute(["%$username%"]);
-            $clients = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            debugLog("search_clients: username='$username', found=" . count($clients), 'api_debug.log');
-            echo json_encode(['success' => true, 'clients' => $clients]);
-        } catch (PDOException $e) {
-            debugLog("search_clients error: " . $e->getMessage(), 'api_debug.log');
-            echo json_encode(['success' => false, 'message' => 'Database error']);
-        }
-        break;
+    case 'search_customers':
+    if (!isAdmin()) {
+        debugLog("Unauthorized access to search_customers by non-admin", 'api_debug.log');
+        echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
+        exit;
+    }
+    $search_term = trim($_GET['username'] ?? '');
+    try {
+        $stmt = $pdo->prepare("SELECT id, username, email, loyalty_points FROM customers WHERE username LIKE ? OR email LIKE ?");
+        $stmt->execute(["%$search_term%", "%$search_term%"]);
+        $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        debugLog("search_customers: search_term='$search_term', found=" . count($customers), 'api_debug.log');
+        echo json_encode(['success' => true, 'customers' => $customers]);
+    } catch (PDOException $e) {
+        debugLog("search_customers error: " . $e->getMessage(), 'api_debug.log');
+        echo json_encode(['success' => false, 'message' => 'Database error']);
+    }
+    break;
 
     case 'search_products':
-        $query = trim($_GET['query'] ?? '');
-        try {
-            $stmt = $pdo->prepare("SELECT id, name, price, quantity, barcode FROM products WHERE (name LIKE ? OR barcode = ?) AND quantity > 0");
-            $stmt->execute(["%$query%", $query]);
-            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            debugLog("search_products: query='$query', found=" . count($products), 'api_debug.log');
-            echo json_encode(['success' => true, 'products' => $products]);
-        } catch (PDOException $e) {
-            debugLog("search_products error: " . $e->getMessage(), 'api_debug.log');
-            echo json_encode(['success' => false, 'message' => 'Database error']);
+    try {
+        if (!isset($_GET['term']) || strlen(trim($_GET['term'])) < 2) {
+            sendJsonResponse(200, []); // Return empty array for short/invalid queries
+            exit;
         }
-        break;
+        $term = '%' . trim($_GET['term']) . '%';
+        $stmt = $pdo->prepare("SELECT id, name, barcode, price, quantity 
+                              FROM products 
+                              WHERE (name LIKE :term OR barcode LIKE :term) 
+                              AND quantity > 0 
+                              ORDER BY name ASC 
+                              LIMIT 10");
+        $stmt->execute([':term' => $term]);
+        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        debugLog("search_products: Found " . count($products) . " products for term=" . $_GET['term']);
+        sendJsonResponse(200, $products);
+    } catch (Exception $e) {
+        debugLog('Error in search_products: ' . $e->getMessage());
+        sendJsonResponse(200, []); // Return empty array on error
+    }
+    break;
 
     case 'checkout':
     $raw_input = file_get_contents('php://input');
@@ -124,13 +150,29 @@ switch ($action) {
         exit;
     }
 
-    $client_id = isset($json_data['client_id']) ? (int)$json_data['client_id'] : 0;
+    $customer_id = isset($json_data['customer_id']) ? (int)$json_data['customer_id'] : 0;
     $items = isset($json_data['items']) && is_array($json_data['items']) ? $json_data['items'] : [];
+    if (!empty($_SESSION['cart'])) {
+    foreach ($_SESSION['cart'] as $item) {
+        $items[] = [
+            'id' => $item['id'],
+            'quantity' => $item['quantity']
+        ];
+    }
+ } else {
+    debugLog("Checkout error: Cart is empty", 'api_debug.log');
+    echo json_encode(['success' => false, 'message' => 'Cart is empty']);
+    exit;
+ }
     $csrf_token = isset($json_data['csrf_token']) ? $json_data['csrf_token'] : '';
+    $points_earned = isset($json_data['points_earned']) ? (int)$json_data['points_earned'] : 0;
+    $points_redeemed = isset($json_data['points_redeemed']) ? (int)$json_data['points_redeemed'] : 0;
+    $payment_methods = isset($json_data['payment_methods']) && is_array($json_data['payment_methods']) ? $json_data['payment_methods'] : [];
 
-    debugLog("Checkout: client_id=$client_id, items=" . json_encode($items), 'api_debug.log');
+    debugLog("Checkout: customer_id=$customer_id, items=" . json_encode($items) . ", points_earned=$points_earned, points_redeemed=$points_redeemed, payment_methods=" . json_encode($payment_methods), 'api_debug.log');
     debugLog("Items type: " . gettype($items) . ", count: " . count($items), 'api_debug.log');
     debugLog("Items structure: " . print_r($items, true), 'api_debug.log');
+    debugLog("Payment methods count: " . count($payment_methods), 'api_debug.log');
 
     if (!validateCsrfToken($csrf_token)) {
         debugLog("Invalid CSRF token: $csrf_token", 'api_debug.log');
@@ -138,9 +180,9 @@ switch ($action) {
         exit;
     }
 
-    if ($client_id <= 0) {
-        debugLog("Invalid client_id: $client_id", 'api_debug.log');
-        echo json_encode(['success' => false, 'message' => 'Invalid client ID']);
+    if ($customer_id <= 0) {
+        debugLog("Invalid customer_id: $customer_id", 'api_debug.log');
+        echo json_encode(['success' => false, 'message' => 'Invalid customer ID']);
         exit;
     }
 
@@ -150,7 +192,13 @@ switch ($action) {
         exit;
     }
 
-    foreach ($items as $index => $item) {
+    if (!is_array($payment_methods) || count($payment_methods) === 0) {
+        debugLog("Payment methods array is empty or not an array: " . gettype($payment_methods), 'api_debug.log');
+        echo json_encode(['success' => false, 'message' => 'No payment methods provided']);
+        exit;
+    }
+
+    foreach ($items as $index => &$item) {
         if (!isset($item['id'], $item['quantity']) || 
             !is_numeric($item['id']) || (int)$item['id'] <= 0 || 
             !is_numeric($item['quantity']) || (int)$item['quantity'] <= 0) {
@@ -158,20 +206,35 @@ switch ($action) {
             echo json_encode(['success' => false, 'message' => 'Invalid items in cart']);
             exit;
         }
-        $items[$index] = [
-            'id' => (int)$item['id'],
-            'quantity' => (int)$item['quantity']
-        ];
+        $item['id'] = (int)$item['id'];
+        $item['quantity'] = (int)$item['quantity'];
     }
+    unset($item);
 
-    if (isClient() && $client_id !== $_SESSION['user_id']) {
-        debugLog("Unauthorized checkout for client_id=$client_id by user {$_SESSION['user_id']}", 'api_debug.log');
-        echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
-        exit;
+    // Validate payment methods
+    $valid_payment_methods = ['Cash', 'Credit Card', 'Loyalty Points'];
+    $payment_total = 0;
+    foreach ($payment_methods as $index => $pm) {
+        if (!isset($pm['method'], $pm['amount']) || 
+            !in_array($pm['method'], $valid_payment_methods) || 
+            !is_numeric($pm['amount']) || (float)$pm['amount'] < 0) {
+            debugLog("Invalid payment method at index $index: " . json_encode($pm), 'api_debug.log');
+            echo json_encode(['success' => false, 'message' => 'Invalid payment method or amount']);
+            exit;
+        }
+        $payment_total += (float)$pm['amount'];
     }
 
     try {
         $pdo->beginTransaction();
+
+        // Verify customer exists
+        $stmt = $pdo->prepare("SELECT id FROM customers WHERE id = ?");
+        $stmt->execute([$customer_id]);
+        if (!$stmt->fetch()) {
+            throw new Exception("Customer ID $customer_id not found");
+        }
+
         $total_amount = 0;
         $item_details = [];
         foreach ($items as $item) {
@@ -180,6 +243,9 @@ switch ($action) {
             $product = $productStmt->fetch(PDO::FETCH_ASSOC);
             if (!$product) {
                 throw new Exception("Product ID {$item['id']} not found");
+            }
+            if ($product['quantity'] < $item['quantity']) {
+                throw new Exception("Insufficient stock for product ID {$item['id']}");
             }
             $item_total = $item['quantity'] * $product['price'];
             $total_amount += $item_total;
@@ -190,16 +256,46 @@ switch ($action) {
             ];
         }
 
+        // Calculate tax
+        $tax_rate = 0.05; // 5%
+        $tax_amount = $total_amount * $tax_rate;
+
         // Calculate discounts
         $discount_result = calculateDiscount($item_details, $total_amount);
         $discount_amount = $discount_result['total_discount'];
         $applied_discounts = $discount_result['applied_discounts'];
-        $final_amount = max(0, $total_amount - $discount_amount);
 
-        // Insert sale header with discount information
-        $stmt = $pdo->prepare("INSERT INTO sales_header (total_amount, discount_amount, final_amount, user_id, sale_date) 
-                               VALUES (?, ?, ?, ?, NOW())");
-        $stmt->execute([$total_amount, $discount_amount, $final_amount, $client_id]);
+        // Apply loyalty discount if points were redeemed
+        $loyalty_discount_amount = 0;
+        if ($points_redeemed > 0) {
+            $stmt = $pdo->prepare("SELECT loyalty_points FROM customers WHERE id = ?");
+            $stmt->execute([$customer_id]);
+            $current_points = $stmt->fetchColumn();
+            if ($current_points === false || $current_points < $points_redeemed) {
+                throw new Exception("Insufficient loyalty points");
+            }
+            $loyalty_discount_amount = $points_redeemed / 100; // 100 points = $1 discount
+            $stmt = $pdo->prepare("UPDATE customers SET loyalty_points = loyalty_points - ? WHERE id = ?");
+            $stmt->execute([$points_redeemed, $customer_id]);
+        }
+
+        $final_amount = max(0, ($total_amount + $tax_amount) - ($discount_amount + $loyalty_discount_amount));
+
+        // Validate payment total matches final amount
+        if (abs($payment_total - $final_amount) > 0.01) { // Allow small float differences
+            throw new Exception("Payment total ($payment_total) does not match final amount ($final_amount)");
+        }
+
+        // Filter out zero-amount payment methods and prepare JSON
+        $payment_methods_filtered = array_filter($payment_methods, function($pm) {
+            return (float)$pm['amount'] > 0;
+        });
+        $payment_methods_json = json_encode(array_values($payment_methods_filtered));
+
+        // Insert sale header with discount, tax, and payment methods
+        $stmt = $pdo->prepare("INSERT INTO sales_header (total_amount, payment_methods, discount_amount, loyalty_discount_amount, tax_amount, final_amount, points_earned, customer_id, sale_date) 
+                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+        $stmt->execute([$total_amount, $payment_methods_json, $discount_amount, $loyalty_discount_amount, $tax_amount, $final_amount, $points_earned, $customer_id]);
         $sale_id = $pdo->lastInsertId();
 
         // Insert sale items
@@ -226,16 +322,55 @@ switch ($action) {
             }
         }
 
+        // Update loyalty points if earned
+        if ($points_earned > 0) {
+            $stmt = $pdo->prepare("UPDATE customers SET loyalty_points = loyalty_points + ? WHERE id = ?");
+            $stmt->execute([$points_earned, $customer_id]);
+        }
+
+        // Fetch updated loyalty points
+        $stmt = $pdo->prepare("SELECT loyalty_points FROM customers WHERE id = ?");
+        $stmt->execute([$customer_id]);
+        $new_points = $stmt->fetchColumn();
+
         $pdo->commit();
-        debugLog("Checkout successful: sale_id=$sale_id, discount_amount=$discount_amount", 'api_debug.log');
+        $_SESSION['cart'] = [];
+        debugLog("Checkout successful: sale_id=$sale_id, customer_id=$customer_id, discount_amount=$discount_amount, loyalty_discount_amount=$loyalty_discount_amount, tax_amount=$tax_amount, final_amount=$final_amount, points_earned=$points_earned, payment_methods=" . $payment_methods_json, 'api_debug.log');
         clearCache('get_products_*');
         clearCache('get_available_products_*');
         clearCache('get_low_stock_products_*');
         clearCache('get_sales_report_*');
-        echo json_encode(['success' => true, 'sale_id' => $sale_id]);
+        echo json_encode(['success' => true, 'sale_id' => $sale_id, 'points_earned' => $points_earned, 'new_points' => (int)$new_points]);
     } catch (Exception $e) {
         $pdo->rollBack();
         debugLog("Checkout error: " . $e->getMessage(), 'api_debug.log');
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+    break;
+
+
+    case 'upload_product_image':
+    try {
+        if (!isAdmin()) {
+            throw new Exception('Unauthorized access');
+        }
+        if (!isset($_FILES['image']) || !isset($_POST['product_id']) || !validateCsrfToken($_POST['csrf_token'] ?? '')) {
+            throw new Exception('Invalid request');
+        }
+        $product_id = (int)$_POST['product_id'];
+        if ($product_id <= 0) {
+            throw new Exception('Invalid product ID');
+        }
+        $result = processImageUpload($_FILES['image'], $product_id);
+        if ($result['status'] === 'error') {
+            throw new Exception($result['message']);
+        }
+        $stmt = $pdo->prepare("UPDATE products SET image = ? WHERE id = ?");
+        $stmt->execute([$result['filename'], $product_id]);
+        debugLog("Uploaded image for product_id=$product_id: " . $result['filename'], 'api_debug.log');
+        echo json_encode(['success' => true, 'image_path' => $result['filename']]);
+    } catch (Exception $e) {
+        debugLog("Error in upload_product_image: " . $e->getMessage(), 'api_debug.log');
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
     break;
@@ -366,24 +501,37 @@ switch ($action) {
     break;
 
     case 'get_inventory':
+    if (!isAdmin()) {
+        sendJsonResponse(403, ['error' => 'Unauthorized']);
+        exit;
+    }
     try {
-        $query = "SELECT p.id, p.name, p.category_id, c.name as category_name, p.price, p.quantity, p.barcode
-                  FROM products p
-                  LEFT JOIN categories c ON p.category_id = c.id";
+        $search = isset($_GET['search']) ? '%' . trim($_GET['search']) . '%' : '%';
+        $category_id = isset($_GET['category_id']) && is_numeric($_GET['category_id']) ? (int)$_GET['category_id'] : null;
+
+        $query = "SELECT p.*, c.name as category_name 
+                  FROM products p 
+                  LEFT JOIN categories c ON p.category_id = c.id 
+                  WHERE (p.name LIKE :search OR p.barcode LIKE :search)";
+        $params = [':search' => $search];
+
+        if ($category_id !== null) {
+            $query .= " AND p.category_id = :category_id";
+            $params[':category_id'] = $category_id;
+        }
+
         $stmt = $pdo->prepare($query);
-        $stmt->execute();
-        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        header('Content-Type: application/json');
-        echo json_encode($products);
-        debugLog("Fetched inventory", 'api_log.log');
+        $stmt->execute($params);
+        $inventory = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        sendJsonResponse(200, ['inventory' => $inventory]);
     } catch (Exception $e) {
-        debugLog("Error fetching inventory: " . $e->getMessage(), 'api_log.log');
-        header('Content-Type: application/json');
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        debugLog('Error in get_inventory: ' . $e->getMessage());
+        sendJsonResponse(500, ['error' => 'Failed to fetch inventory']);
     }
     break;
 
-case 'add_product':
+ case 'add_product':
     try {
         $data = json_decode(file_get_contents('php://input'), true);
         $name = isset($data['name']) ? trim($data['name']) : '';
@@ -414,16 +562,18 @@ case 'add_product':
     }
     break;
 
-case 'update_product':
+ case 'update_product':
     try {
         $data = json_decode(file_get_contents('php://input'), true);
-        $id = isset($data['id']) ? (int)$data['id'] : 0;
-        $name = isset($data['name']) ? trim($data['name']) : '';
-        $category_id = isset($data['category_id']) ? (int)$data['category_id'] : 0;
-        $price = isset($data['price']) ? (float)$data['price'] : 0;
-        $quantity = isset($data['quantity']) ? (int)$data['quantity'] : 0;
-        $barcode = isset($data['barcode']) ? trim($data['barcode']) : '';
-        $csrf_token = isset($data['csrf_token']) ? $data['csrf_token'] : '';
+        $id = (int)($data['id'] ?? 0);
+        $name = trim($data['name'] ?? '');
+        $category_id = (int)($data['category_id'] ?? 0);
+        $price = (float)($data['price'] ?? 0);
+        $quantity = (int)($data['quantity'] ?? 0);
+        $barcode = trim($data['barcode'] ?? '');
+        $image = trim($data['image'] ?? '');
+        $description = trim($data['description'] ?? '');
+        $csrf_token = $data['csrf_token'] ?? '';
 
         if ($id <= 0 || empty($name) || $category_id <= 0 || $price <= 0 || $quantity < 0 || empty($barcode) || !validateCsrfToken($csrf_token)) {
             throw new Exception('Invalid input data or CSRF token.');
@@ -436,17 +586,18 @@ case 'update_product':
             throw new Exception('Barcode already exists for another product.');
         }
 
-        $stmt = $pdo->prepare("UPDATE products SET name = ?, category_id = ?, price = ?, quantity = ?, barcode = ? WHERE id = ?");
-        $stmt->execute([$name, $category_id, $price, $quantity, $barcode, $id]);
+        $stmt = $pdo->prepare("UPDATE products SET name = ?, category_id = ?, price = ?, quantity = ?, barcode = ?, image = ?, description = ? WHERE id = ?");
+        $stmt->execute([$name, $category_id, $price, $quantity, $barcode, $image ?: null, $description ?: null, $id]);
+        
+        debugLog("Updated product ID: $id", 'api_debug.log');
         echo json_encode(['success' => true]);
-        debugLog("Updated product ID: $id", 'api_log.log');
     } catch (Exception $e) {
-        debugLog("Error updating product: " . $e->getMessage(), 'api_log.log');
+        debugLog("Error updating product: " . $e->getMessage(), 'api_debug.log');
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
     break;
 
-case 'delete_product':
+ case 'delete_product':
     try {
         $data = json_decode(file_get_contents('php://input'), true);
         $id = isset($data['id']) ? (int)$data['id'] : 0;
@@ -501,9 +652,10 @@ case 'delete_product':
         }
 
         // Fetch sale details
-        $query = "SELECT sh.id, sh.total_amount, sh.sale_date, u.username
+        $query = "SELECT sh.id, sh.total_amount, sh.discount_amount, sh.loyalty_discount_amount, sh.final_amount, sh.sale_date, 
+                         c.username, c.email, c.first_name, c.last_name
                   FROM sales_header sh
-                  JOIN users u ON sh.user_id = u.id
+                  JOIN customers c ON sh.customer_id = c.id
                   WHERE sh.id = ?";
         $stmt = $pdo->prepare($query);
         $stmt->execute([$sale_id]);
@@ -517,7 +669,7 @@ case 'delete_product':
                          d.name as discount_name, sd.discount_amount
                   FROM sale_items si
                   JOIN products p ON si.product_id = p.id
-                  LEFT JOIN sale_discounts sd ON sd.sale_id = si.sale_id AND sd.product_id = si.product_id
+                  LEFT JOIN sale_discounts sd ON sd.sale_id = si.sale_id
                   LEFT JOIN discounts d ON sd.discount_id = d.id
                   WHERE si.sale_id = ?";
         $stmt = $pdo->prepare($query);
@@ -526,10 +678,10 @@ case 'delete_product':
 
         // Calculate totals
         $subtotal = array_sum(array_column($items, 'total'));
-        $total_discount = array_sum(array_column($items, 'discount_amount'));
+        $total_discount = ($sale['discount_amount'] ?? 0) + ($sale['loyalty_discount_amount'] ?? 0);
         $tax_rate = 0.05; // 5%
         $tax_amount = $subtotal * $tax_rate;
-        $total = $subtotal + $tax_amount - $total_discount;
+        $total = $sale['final_amount'] ?? ($subtotal + $tax_amount - $total_discount);
 
         require_once 'vendor/autoload.php';
         $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
@@ -554,7 +706,9 @@ case 'delete_product':
         $pdf->SetFont('helvetica', '', 10);
         $pdf->Cell(0, 5, "Sale ID: {$sale['id']}", 0, 1);
         $pdf->Cell(0, 5, "Date: " . date('Y-m-d H:i:s', strtotime($sale['sale_date'])), 0, 1);
-        $pdf->Cell(0, 5, "Client: {$sale['username']}", 0, 1);
+        $customer_name = trim(($sale['first_name'] ?? '') . ' ' . ($sale['last_name'] ?? ''));
+        $pdf->Cell(0, 5, "Customer: {$sale['username']} ($customer_name)", 0, 1);
+        $pdf->Cell(0, 5, "Email: {$sale['email']}", 0, 1);
         $pdf->Ln(5);
 
         $pdf->SetFillColor(200, 200, 200);
@@ -597,10 +751,10 @@ case 'delete_product':
         header('Pragma: no-cache');
         header('Expires: 0');
         echo $pdfContent;
-        debugLog("Generated receipt PDF for sale ID: $sale_id", 'api_log.log');
+        debugLog("Generated receipt PDF for sale ID: $sale_id", 'api_debug.log');
         exit;
     } catch (Exception $e) {
-        debugLog("Error generating receipt PDF: " . $e->getMessage(), 'api_log.log');
+        debugLog("Error generating receipt PDF: " . $e->getMessage(), 'api_debug.log');
         header('Content-Type: application/json');
         header('HTTP/1.1 500 Internal Server Error');
         echo json_encode(['status' => 'error', 'message' => 'Error generating receipt: ' . $e->getMessage()]);
@@ -893,7 +1047,7 @@ case 'delete_product':
     break;
 
     // Add these cases in the switch ($action) block
-case 'add_discount':
+ case 'add_discount':
     if (!isAdmin()) {
         debugLog("Unauthorized access to add_discount", 'api_debug.log');
         echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
@@ -929,7 +1083,7 @@ case 'add_discount':
     }
     break;
 
-case 'update_discount':
+ case 'update_discount':
     if (!isAdmin()) {
         debugLog("Unauthorized access to update_discount", 'api_debug.log');
         echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
@@ -969,7 +1123,7 @@ case 'update_discount':
     }
     break;
 
-case 'get_discounts':
+ case 'get_discounts':
     if (!isAdmin()) {
         debugLog("Unauthorized access to get_discounts", 'api_debug.log');
         echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
@@ -993,7 +1147,7 @@ case 'get_discounts':
     }
     break;
 
-case 'delete_discount':
+ case 'delete_discount':
     if (!isAdmin()) {
         debugLog("Unauthorized access to delete_discount", 'api_debug.log');
         echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
@@ -1241,30 +1395,33 @@ case 'delete_discount':
         break;
 
     case 'get_products':
-        try {
-            $search = trim($_GET['search'] ?? '');
-            $threshold = getLowStockThreshold();
-            $query = "SELECT p.id, p.name, p.price, p.quantity, p.image, p.category_id, c.name AS category_name, p.description, p.barcode, 
-                             (p.quantity <= ?) AS is_low_stock 
-                             FROM products p 
-                             LEFT JOIN categories c ON p.category_id = c.id";
-            $params = [$threshold];
-            if ($search) {
-                $query .= " WHERE p.name LIKE ? OR p.barcode LIKE ?";
-                $params[] = '%' . $search . '%';
-                $params[] = '%' . $search . '%';
-            }
-            $query .= " ORDER BY p.id ASC";
-            $stmt = $pdo->prepare($query);
-            $stmt->execute($params);
-            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            debugLog("Fetched " . count($products) . " products, threshold=$threshold", 'api_debug.log');
-            echo json_encode($products);
-        } catch (Exception $e) {
-            debugLog("Error in get_products: " . $e->getMessage(), 'api_debug.log');
-            echo json_encode(['status' => 'error', 'message' => 'Error: ' . $e->getMessage()]);
+    try {
+        $search = trim($_GET['search'] ?? '');
+        $category = isset($_GET['category']) ? (int)$_GET['category'] : null;
+        $query = "SELECT p.id, p.name, p.price, p.quantity, p.image_url, p.description, p.barcode, c.name AS category_name 
+                  FROM products p 
+                  LEFT JOIN categories c ON p.category_id = c.id 
+                  WHERE 1=1";
+        $params = [];
+        if ($search) {
+            $query .= " AND (p.name LIKE ? OR p.barcode LIKE ?)";
+            $params[] = "%$search%";
+            $params[] = "%$search%";
         }
-        break;
+        if ($category) {
+            $query .= " AND p.category_id = ?";
+            $params[] = $category;
+        }
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
+        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(['success' => true, 'products' => $products]);
+        debugLog("Fetched products: search='$search', category=" . ($category ?? 'all'), 'api_debug.log');
+    } catch (Exception $e) {
+        debugLog("Error in get_products: " . $e->getMessage(), 'api_debug.log');
+        echo json_encode(['success' => false, 'message' => 'Error fetching products']);
+    }
+    break;
 
     case 'get_available_products':
         try {
@@ -1291,56 +1448,56 @@ case 'delete_discount':
         }
         break;
 
-    case 'process_sale':
-        $product_id = intval($data['product_id'] ?? 0);
-        $quantity = intval($data['quantity'] ?? 0);
-        $user_id = intval($data['client_id'] ?? 0);
-        debugLog("Process sale: product_id=$product_id, quantity=$quantity, user_id=$user_id", 'api_debug.log');
-        if ($product_id <= 0 || $quantity <= 0 || $user_id <= 0) {
-            debugLog("Error: Invalid sale data", 'api_debug.log');
-            echo json_encode(['status' => 'error', 'message' => 'Invalid sale data']);
-            exit;
-        }
-        try {
-            $stmt = $pdo->prepare("SELECT id, role FROM users WHERE id = ?");
-            $stmt->execute([$user_id]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            if (!$user || ($user['role'] !== 'client' && isClient() && $user_id !== $_SESSION['user_id'])) {
-                debugLog("Error: Invalid or unauthorized user ID $user_id", 'api_debug.log');
-                echo json_encode(['status' => 'error', 'message' => 'Invalid or unauthorized user']);
-                exit;
-            }
-            $pdo->beginTransaction();
-            $productStmt = $pdo->prepare("SELECT price, quantity FROM products WHERE id = ? FOR UPDATE");
-            $productStmt->execute([$product_id]);
-            $product = $productStmt->fetch(PDO::FETCH_ASSOC);
-            if (!$product) {
-                throw new Exception("Product ID $product_id not found");
-            }
-            if ($product['quantity'] < $quantity) {
-                throw new Exception("Insufficient stock for product ID $product_id");
-            }
-            $total_amount = $product['price'] * $quantity;
-            $stmt = $pdo->prepare("INSERT INTO sales_header (total_amount, user_id, sale_date) VALUES (?, ?, NOW())");
-            $stmt->execute([$total_amount, $user_id]);
-            $sale_id = $pdo->lastInsertId();
-            $stmt = $pdo->prepare("INSERT INTO sale_items (sale_id, product_id, quantity, price, sale_date) VALUES (?, ?, ?, ?, NOW())");
-            $stmt->execute([$sale_id, $product_id, $quantity, $product['price']]);
-            $updateStmt = $pdo->prepare("UPDATE products SET quantity = quantity - ? WHERE id = ?");
-            $updateStmt->execute([$quantity, $product_id]);
-            $pdo->commit();
-            debugLog("Sale processed: sale_id=$sale_id", 'api_debug.log');
-            clearCache('get_products_*');
-            clearCache('get_available_products_*');
-            clearCache('get_low_stock_products_*');
-            clearCache('get_sales_report_*');
-            echo json_encode(['status' => 'success', 'sale_id' => $sale_id]);
-        } catch (Exception $e) {
-            $pdo->rollBack();
-            debugLog("Error in process_sale: " . $e->getMessage(), 'api_debug.log');
-            echo json_encode(['status' => 'error', 'message' => 'Error: ' . $e->getMessage()]);
-        }
-        break;
+    // case 'process_sale':
+    //     $product_id = intval($data['product_id'] ?? 0);
+    //     $quantity = intval($data['quantity'] ?? 0);
+    //     $user_id = intval($data['client_id'] ?? 0);
+    //     debugLog("Process sale: product_id=$product_id, quantity=$quantity, user_id=$user_id", 'api_debug.log');
+    //     if ($product_id <= 0 || $quantity <= 0 || $user_id <= 0) {
+    //         debugLog("Error: Invalid sale data", 'api_debug.log');
+    //         echo json_encode(['status' => 'error', 'message' => 'Invalid sale data']);
+    //         exit;
+    //     }
+    //     try {
+    //         $stmt = $pdo->prepare("SELECT id, role FROM users WHERE id = ?");
+    //         $stmt->execute([$user_id]);
+    //         $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    //         if (!$user || ($user['role'] !== 'client' && isClient() && $user_id !== $_SESSION['user_id'])) {
+    //             debugLog("Error: Invalid or unauthorized user ID $user_id", 'api_debug.log');
+    //             echo json_encode(['status' => 'error', 'message' => 'Invalid or unauthorized user']);
+    //             exit;
+    //         }
+    //         $pdo->beginTransaction();
+    //         $productStmt = $pdo->prepare("SELECT price, quantity FROM products WHERE id = ? FOR UPDATE");
+    //         $productStmt->execute([$product_id]);
+    //         $product = $productStmt->fetch(PDO::FETCH_ASSOC);
+    //         if (!$product) {
+    //             throw new Exception("Product ID $product_id not found");
+    //         }
+    //         if ($product['quantity'] < $quantity) {
+    //             throw new Exception("Insufficient stock for product ID $product_id");
+    //         }
+    //         $total_amount = $product['price'] * $quantity;
+    //         $stmt = $pdo->prepare("INSERT INTO sales_header (total_amount, user_id, sale_date) VALUES (?, ?, NOW())");
+    //         $stmt->execute([$total_amount, $user_id]);
+    //         $sale_id = $pdo->lastInsertId();
+    //         $stmt = $pdo->prepare("INSERT INTO sale_items (sale_id, product_id, quantity, price, sale_date) VALUES (?, ?, ?, ?, NOW())");
+    //         $stmt->execute([$sale_id, $product_id, $quantity, $product['price']]);
+    //         $updateStmt = $pdo->prepare("UPDATE products SET quantity = quantity - ? WHERE id = ?");
+    //         $updateStmt->execute([$quantity, $product_id]);
+    //         $pdo->commit();
+    //         debugLog("Sale processed: sale_id=$sale_id", 'api_debug.log');
+    //         clearCache('get_products_*');
+    //         clearCache('get_available_products_*');
+    //         clearCache('get_low_stock_products_*');
+    //         clearCache('get_sales_report_*');
+    //         echo json_encode(['status' => 'success', 'sale_id' => $sale_id]);
+    //     } catch (Exception $e) {
+    //         $pdo->rollBack();
+    //         debugLog("Error in process_sale: " . $e->getMessage(), 'api_debug.log');
+    //         echo json_encode(['status' => 'error', 'message' => 'Error: ' . $e->getMessage()]);
+    //     }
+    //     break;
 
     case 'get_product_suggestions':
     if (!isAdmin()) {
@@ -1433,27 +1590,28 @@ case 'delete_discount':
         exit;
     }
     try {
-        $search = trim($_GET['search'] ?? '');
+        $search = $_GET['search'] ?? '';
         $query = "SELECT id, username, email, first_name, last_name, phone, address, created_at 
                   FROM customers";
+        $params = [];
         if ($search) {
             $query .= " WHERE username LIKE ? OR email LIKE ?";
-            $stmt = $pdo->prepare($query);
-            $stmt->execute(['%' . $search . '%', '%' . $search . '%']);
-        } else {
-            $stmt = $pdo->prepare($query);
-            $stmt->execute();
+            $params[] = "%$search%";
+            $params[] = "%$search%";
         }
-        $customers = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fixed: Use $stmt instead of $pdo
+        $query .= " ORDER BY username ASC";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
+        $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
         debugLog("Fetched " . count($customers) . " customers", 'api_debug.log');
         echo json_encode($customers);
     } catch (Exception $e) {
-        debugLog("Error fetching customers: " . $e->getMessage(), 'api_debug.log');
+        debugLog("Error in get_all_customers: " . $e->getMessage(), 'api_debug.log');
         echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
     }
     break;
 
-case 'get_customer_history':
+ case 'get_customer_history':
     if (!isAdmin()) {
         debugLog("Unauthorized access to get_customer_history", 'api_debug.log');
         echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
@@ -1480,345 +1638,845 @@ case 'get_customer_history':
     }
     break;
 
+    case 'get_stock_adjustments':
+    if (!isAdmin()) {
+        debugLog("Unauthorized access to get_stock_adjustments", 'api_debug.log');
+        echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
+        exit;
+    }
+    try {
+        $search = trim($_GET['search'] ?? '');
+        $start_date = $_GET['start_date'] ?? '';
+        $end_date = $_GET['end_date'] ?? '';
+        $query = "SELECT sa.id, sa.product_id, p.name AS product_name, p.quantity AS current_quantity, sa.quantity, sa.reason, sa.adjusted_at, u.username AS user_name
+                  FROM stock_adjustments sa
+                  JOIN products p ON sa.product_id = p.id
+                  LEFT JOIN users u ON sa.user_id = u.id";
+        $params = [];
+        $conditions = [];
+        if ($search) {
+            $conditions[] = "(p.name LIKE ? OR sa.reason LIKE ?)";
+            $params[] = '%' . $search . '%';
+            $params[] = '%' . $search . '%';
+        }
+        if ($start_date) {
+            $conditions[] = "sa.adjusted_at >= ?";
+            $params[] = $start_date;
+        }
+        if ($end_date) {
+            $conditions[] = "sa.adjusted_at <= ?";
+            $params[] = $end_date . ' 23:59:59';
+        }
+        if ($conditions) {
+            $query .= " WHERE " . implode(' AND ', $conditions);
+        }
+        $query .= " ORDER BY sa.adjusted_at DESC";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
+        $adjustments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        debugLog("Fetched " . count($adjustments) . " stock adjustments", 'api_debug.log');
+        header('Content-Type: application/json');
+        echo json_encode($adjustments);
+    } catch (Exception $e) {
+        debugLog("Error fetching stock adjustments: " . $e->getMessage(), 'api_debug.log');
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+    break;
 
     case 'get_sales_forecast':
     if (!isAdmin()) {
+        debugLog("Unauthorized access to get_sales_forecast", 'api_debug.log');
         echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
         exit;
     }
+    try {
+        $start_date = $_GET['start_date'] ?? date('Y-m-d', strtotime('-90 days'));
+        $end_date = $_GET['end_date'] ?? date('Y-m-d');
+        $days = intval($_GET['days'] ?? 30);
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $start_date) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $end_date) || $days <= 0) {
+            throw new Exception('Invalid input parameters');
+        }
+        // Fetch historical sales
+        $stmt = $pdo->prepare("
+            SELECT p.name AS product_name, SUM(si.quantity) AS historical_sales
+            FROM sale_items si
+            JOIN products p ON si.product_id = p.id
+            JOIN sales_header sh ON si.sale_id = sh.id
+            WHERE sh.sale_date BETWEEN ? AND ?
+            GROUP BY p.id, p.name
+        ");
+        $stmt->execute([$start_date . ' 00:00:00', $end_date . ' 23:59:59']);
+        $historical = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Simple forecast: assume same sales volume for next period
+        $forecasts = array_map(function($row) use ($days) {
+            $daily_avg = $row['historical_sales'] / 90; // Assuming 90-day historical period
+            $predicted = $daily_avg * $days;
+            return [
+                'product_name' => $row['product_name'],
+                'historical_sales' => $row['historical_sales'],
+                'predicted_sales' => round($predicted, 2)
+            ];
+        }, $historical);
+        debugLog("Generated sales forecast: start_date=$start_date, end_date=$end_date, days=$days, products=" . count($forecasts), 'api_debug.log');
+        echo json_encode(['status' => 'success', 'forecasts' => $forecasts]);
+    } catch (Exception $e) {
+        debugLog("Error in get_sales_forecast: " . $e->getMessage(), 'api_debug.log');
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+    break;
+
+    case 'get_customer_detailed_history':
+    if (!isAdmin()) {
+        debugLog("Unauthorized access to get_customer_detailed_history", 'api_debug.log');
+        echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
+        exit;
+    }
+    try {
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!isset($data['customer_id']) || !isset($data['csrf_token'])) {
+            throw new Exception('Missing required parameters: customer_id or csrf_token');
+        }
+        $customer_id = intval($data['customer_id']);
+        validateCsrfToken($data['csrf_token']);
+        if ($customer_id <= 0) throw new Exception('Invalid customer ID');
+
+        // Check if customer exists
+        $stmt = $pdo->prepare("SELECT id FROM customers WHERE id = ?");
+        $stmt->execute([$customer_id]);
+        if (!$stmt->fetch()) {
+            throw new Exception('Customer not found');
+        }
+
+        // Fetch detailed history
+        $stmt = $pdo->prepare("
+            SELECT 
+                sh.id AS sale_id,
+                sh.sale_date,
+                p.name AS product_name,
+                si.quantity,
+                si.price AS unit_price,
+                (si.quantity * si.price) AS subtotal,
+                sh.discount_amount,
+                sh.loyalty_discount_amount,
+                sh.final_amount,
+                (si.quantity * si.price * 0.05) AS tax_amount
+            FROM sales_header sh
+            JOIN sale_items si ON sh.id = si.sale_id
+            JOIN products p ON si.product_id = p.id
+            WHERE sh.customer_id = ?
+            ORDER BY sh.sale_date DESC
+        ");
+        $stmt->execute([$customer_id]);
+        $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        debugLog("Fetched detailed history for customer_id=$customer_id, rows=" . count($history), 'api_debug.log');
+        echo json_encode($history);
+    } catch (Exception $e) {
+        debugLog("Error in get_customer_detailed_history: " . $e->getMessage() . " | Trace: " . $e->getTraceAsString(), 'api_debug.log');
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+    break;
+
+    case 'generate_customer_history_pdf':
+    try {
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        $customer_id = isset($data['customer_id']) ? (int)$data['customer_id'] : 0;
+        $csrf_token = isset($data['csrf_token']) ? $data['csrf_token'] : '';
+        
+        if ($customer_id <= 0 || !validateCsrfToken($csrf_token)) {
+            throw new Exception('Invalid customer ID or CSRF token.');
+        }
+
+        // Fetch customer details
+        $stmt = $pdo->prepare("SELECT username, email, first_name, last_name FROM customers WHERE id = ?");
+        $stmt->execute([$customer_id]);
+        $customer = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$customer) {
+            throw new Exception('Customer not found.');
+        }
+
+        // Fetch purchase history
+        $stmt = $pdo->prepare("
+            SELECT 
+                sh.id AS sale_id,
+                sh.sale_date,
+                p.name AS product_name,
+                si.quantity,
+                si.price AS unit_price,
+                (si.quantity * si.price) AS subtotal,
+                sh.discount_amount,
+                sh.loyalty_discount_amount,
+                sh.final_amount,
+                (si.quantity * si.price * 0.05) AS tax_amount
+            FROM sales_header sh
+            JOIN sale_items si ON sh.id = si.sale_id
+            JOIN products p ON si.product_id = p.id
+            WHERE sh.customer_id = ?
+            ORDER BY sh.sale_date DESC
+        ");
+        $stmt->execute([$customer_id]);
+        $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        require_once 'vendor/autoload.php';
+        $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+        $pdf->SetCreator(PDF_CREATOR);
+        $pdf->SetAuthor('POS System');
+        $pdf->SetTitle('Customer Purchase History');
+        $pdf->SetSubject('Customer Purchase History Report');
+        $pdf->SetKeywords('Customer, Purchase History, POS');
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->SetMargins(15, 15, 15);
+        $pdf->SetAutoPageBreak(TRUE, 15);
+        $pdf->AddPage();
+        $pdf->SetFont('helvetica', '', 12);
+
+        $pdf->SetFont('helvetica', 'B', 16);
+        $pdf->Cell(0, 10, 'POS System Company', 0, 1, 'C');
+        $pdf->SetFont('helvetica', 'B', 12);
+        $pdf->Cell(0, 10, 'Customer Purchase History Report', 0, 1, 'C');
+        $pdf->Ln(5);
+
+        $pdf->SetFont('helvetica', '', 10);
+        $customer_name = trim(($customer['first_name'] ?? '') . ' ' . ($customer['last_name'] ?? ''));
+        $pdf->Cell(0, 5, "Customer: {$customer['username']} ($customer_name)", 0, 1);
+        $pdf->Cell(0, 5, "Email: {$customer['email']}", 0, 1);
+        $pdf->Cell(0, 5, "Generated: " . date('Y-m-d H:i:s'), 0, 1);
+        $pdf->Ln(5);
+
+        if (empty($history)) {
+            $pdf->Cell(0, 10, 'No purchase history found.', 0, 1, 'C');
+        } else {
+            $pdf->SetFillColor(200, 200, 200);
+            $pdf->SetFont('helvetica', 'B', 10);
+            $pdf->Cell(30, 7, 'Order ID', 1, 0, 'L', 1);
+            $pdf->Cell(40, 7, 'Date', 1, 0, 'L', 1);
+            $pdf->Cell(50, 7, 'Product', 1, 0, 'L', 1);
+            $pdf->Cell(20, 7, 'Qty', 1, 0, 'R', 1);
+            $pdf->Cell(25, 7, 'Unit Price', 1, 0, 'R', 1);
+            $pdf->Cell(25, 7, 'Subtotal', 1, 0, 'R', 1);
+            $pdf->Cell(25, 7, 'Tax (5%)', 1, 0, 'R', 1);
+            $pdf->Cell(25, 7, 'Total', 1, 1, 'R', 1);
+
+            $pdf->SetFont('helvetica', '', 10);
+            foreach ($history as $sale) {
+                $pdf->Cell(30, 6, $sale['sale_id'], 1);
+                $pdf->Cell(40, 6, date('Y-m-d H:i:s', strtotime($sale['sale_date'])), 1);
+                $pdf->Cell(50, 6, $sale['product_name'], 1);
+                $pdf->Cell(20, 6, $sale['quantity'], 1, 0, 'R');
+                $pdf->Cell(25, 6, '$' . number_format($sale['unit_price'], 2), 1, 0, 'R');
+                $pdf->Cell(25, 6, '$' . number_format($sale['subtotal'], 2), 1, 0, 'R');
+                $pdf->Cell(25, 6, '$' . number_format($sale['tax_amount'], 2), 1, 0, 'R');
+                $pdf->Cell(25, 6, '$' . number_format($sale['final_amount'], 2), 1, 1, 'R');
+            }
+        }
+
+        $pdfContent = $pdf->Output('', 'S');
+        header('Content-Type: application/pdf');
+        header("Content-Disposition: attachment; filename=\"CustomerHistory_{$customer_id}.pdf\"");
+        header('Content-Length: ' . strlen($pdfContent));
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+        echo $pdfContent;
+        debugLog("Generated customer history PDF for customer ID: $customer_id", 'api_debug.log');
+        exit;
+    } catch (Exception $e) {
+        debugLog("Error generating customer history PDF: " . $e->getMessage(), 'api_debug.log');
+        header('Content-Type: application/json');
+        header('HTTP/1.1 500 Internal Server Error');
+        echo json_encode(['status' => 'error', 'message' => 'Error generating PDF: ' . $e->getMessage()]);
+        exit;
+    }
+    break;
+
+    case 'update_customer':
+    if (!isAdmin()) {
+        debugLog("Unauthorized access to update_customer", 'api_debug.log');
+        echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
+        exit;
+    }
+    try {
+        $data = json_decode(file_get_contents('php://input'), true);
+        validateCsrfToken($data['csrf_token'] ?? '');
+        $id = intval($data['id'] ?? 0);
+        if ($id <= 0) throw new Exception('Invalid customer ID');
+        if (empty($data['username']) || empty($data['email'])) {
+            throw new Exception('Username and email are required');
+        }
+        $stmt = $pdo->prepare("SELECT id FROM customers WHERE (username = ? OR email = ?) AND id != ?");
+        $stmt->execute([$data['username'], $data['email'], $id]);
+        if ($stmt->fetch()) {
+            throw new Exception('Username or email already exists for another customer');
+        }
+        $stmt = $pdo->prepare("UPDATE customers SET 
+            username = ?, email = ?, first_name = ?, last_name = ?, 
+            phone = ?, address = ?, updated_at = NOW() 
+            WHERE id = ?");
+        $stmt->execute([
+            $data['username'],
+            $data['email'],
+            $data['first_name'] ?? null,
+            $data['last_name'] ?? null,
+            $data['phone'] ?? null,
+            $data['address'] ?? null,
+            $id
+        ]);
+        debugLog("Updated customer ID: $id", 'api_debug.log');
+        echo json_encode(['status' => 'success', 'message' => 'Customer updated successfully']);
+    } catch (Exception $e) {
+        debugLog("Error in update_customer: " . $e->getMessage(), 'api_debug.log');
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+    break;
+
+    case 'delete_customer':
+    if (!isAdmin()) {
+        debugLog("Unauthorized access to delete_customer", 'api_debug.log');
+        echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
+        exit;
+    }
+    try {
+        $data = json_decode(file_get_contents('php://input'), true);
+        validateCsrfToken($data['csrf_token'] ?? '');
+        $id = intval($data['id'] ?? 0);
+        if ($id <= 0) throw new Exception('Invalid customer ID');
+
+        // Check if customer has orders
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM sales_header WHERE customer_id = ?");
+        $stmt->execute([$id]);
+        if ($stmt->fetchColumn() > 0) {
+            throw new Exception('Cannot delete customer with existing orders');
+        }
+
+        // Delete customer
+        $stmt = $pdo->prepare("DELETE FROM customers WHERE id = ?");
+        $stmt->execute([$id]);
+        if ($stmt->rowCount() === 0) {
+            throw new Exception('Customer not found');
+        }
+
+        debugLog("Deleted customer ID: $id", 'api_debug.log');
+        echo json_encode(['status' => 'success', 'message' => 'Customer deleted successfully']);
+    } catch (Exception $e) {
+        debugLog("Error in delete_customer: " . $e->getMessage(), 'api_debug.log');
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+    break;
+
+    case 'export_stock_adjustments_csv':
+    if (!isAdmin()) {
+        debugLog("Unauthorized access to export_stock_adjustments_csv", 'api_debug.log');
+        echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
+        exit;
+    }
+    try {
+        $search = isset($_GET['search']) ? '%' . trim($_GET['search']) . '%' : null;
+        $start_date = $_GET['start_date'] ?? null;
+        $end_date = $_GET['end_date'] ?? null;
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="stock_adjustments_' . date('Y-m-d') . '.csv"');
+        $output = fopen('php://output', 'w');
+        fputcsv($output, ['ID', 'Product', 'Current Quantity', 'Adjustment', 'Reason', 'Adjusted By', 'Date']);
+        $query = "SELECT sa.id, p.name AS product_name, p.quantity AS current_quantity, 
+                         sa.quantity, sa.reason, u.username AS user_name, sa.adjusted_at
+                  FROM stock_adjustments sa
+                  JOIN products p ON sa.product_id = p.id
+                  LEFT JOIN users u ON sa.user_id = u.id
+                  WHERE 1=1";
+        $params = [];
+        if ($search) {
+            $query .= " AND (p.name LIKE ? OR sa.reason LIKE ?)";
+            $params[] = $search;
+            $params[] = $search;
+        }
+        if ($start_date) {
+            $query .= " AND DATE(sa.adjusted_at) >= ?";
+            $params[] = $start_date;
+        }
+        if ($end_date) {
+            $query .= " AND DATE(sa.adjusted_at) <= ?";
+            $params[] = $end_date;
+        }
+        $query .= " ORDER BY sa.adjusted_at DESC";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            fputcsv($output, [
+                $row['id'],
+                $row['product_name'],
+                $row['current_quantity'],
+                $row['quantity'],
+                $row['reason'],
+                $row['user_name'] ?? 'N/A',
+                $row['adjusted_at']
+            ]);
+        }
+        debugLog("Exported stock adjustments CSV: rows=" . $stmt->rowCount(), 'api_debug.log');
+        fclose($output);
+        exit;
+    } catch (Exception $e) {
+        debugLog("Error in export_stock_adjustments_csv: " . $e->getMessage(), 'api_debug.log');
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+    break;
+
+
+    case 'add_customer':
+           if (!isAdmin()) {
+               debugLog("Unauthorized access to add_customer", 'api_debug.log');
+               echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
+               exit;
+           }
+           try {
+               $data = json_decode(file_get_contents('php://input'), true);
+               validateCsrfToken($data['csrf_token'] ?? '');
+               $username = trim($data['username'] ?? '');
+               $email = trim($data['email'] ?? '');
+               $first_name = trim($data['first_name'] ?? '') ?: null;
+               $last_name = trim($data['last_name'] ?? '') ?: null;
+               $phone = trim($data['phone'] ?? '') ?: null;
+               $address = trim($data['address'] ?? '') ?: null;
+
+               if (empty($username) || empty($email)) {
+                   throw new Exception('Username and email are required');
+               }
+
+               // Validate email format
+               if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                   throw new Exception('Invalid email format');
+               }
+
+               // Check for duplicate username or email
+               $stmt = $pdo->prepare("SELECT COUNT(*) FROM customers WHERE username = ? OR email = ?");
+               $stmt->execute([$username, $email]);
+               if ($stmt->fetchColumn() > 0) {
+                   throw new Exception('Username or email already exists');
+               }
+
+               // Insert customer
+               $stmt = $pdo->prepare("INSERT INTO customers (username, email, first_name, last_name, phone, address, created_at) 
+                                      VALUES (?, ?, ?, ?, ?, ?, NOW())");
+               $stmt->execute([$username, $email, $first_name, $last_name, $phone, $address]);
+
+               debugLog("Added customer: $username", 'api_debug.log');
+               echo json_encode(['status' => 'success', 'message' => 'Customer added successfully']);
+           } catch (Exception $e) {
+               debugLog("Error in add_customer: " . $e->getMessage(), 'api_debug.log');
+               echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+           }
+           break;
+
+
+           case 'update_loyalty_points':
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        debugLog("Invalid request method for update_loyalty_points: {$_SERVER['REQUEST_METHOD']}", 'api_debug.log');
+        echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+        exit;
+    }
+    if (!isAdmin()) {
+        debugLog("Unauthorized access to update_loyalty_points", 'api_debug.log');
+        echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+        exit;
+    }
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!$data || !isset($data['customer_id']) || !isset($data['points']) || !isset($data['csrf_token'])) {
+        debugLog("Missing parameters for update_loyalty_points", 'api_debug.log');
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid request']);
+        exit;
+    }
+    if (!validateCsrfToken($data['csrf_token'])) {
+        debugLog("Invalid CSRF token for update_loyalty_points", 'api_debug.log');
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+        exit;
+    }
+    $customer_id = (int)$data['customer_id'];
+    $points = (int)$data['points'];
+    if ($customer_id <= 0) {
+        debugLog("Invalid customer_id: $customer_id", 'api_debug.log');
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid customer ID']);
+        exit;
+    }
+    try {
+        $stmt = $pdo->prepare("SELECT id FROM customers WHERE id = ?");
+        $stmt->execute([$customer_id]);
+        if (!$stmt->fetch()) {
+            debugLog("Customer not found: $customer_id", 'api_debug.log');
+            echo json_encode(['success' => false, 'message' => 'Customer not found']);
+            exit;
+        }
+        $stmt = $pdo->prepare("UPDATE customers SET loyalty_points = loyalty_points + ? WHERE id = ?");
+        $stmt->execute([$points, $customer_id]);
+        $stmt = $pdo->prepare("SELECT loyalty_points FROM customers WHERE id = ?");
+        $stmt->execute([$customer_id]);
+        $new_points = $stmt->fetchColumn();
+        debugLog("Updated loyalty points for customer_id: $customer_id, points: $points, new_points: $new_points", 'api_debug.log');
+        echo json_encode(['success' => true, 'new_points' => $new_points]);
+    } catch (PDOException $e) {
+        debugLog("Database error in update_loyalty_points: " . $e->getMessage(), 'api_debug.log');
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Database error']);
+    }
+    break;
+
+    case 'redeem_loyalty_points':
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        debugLog("Invalid request method for redeem_loyalty_points: {$_SERVER['REQUEST_METHOD']}", 'api_debug.log');
+        echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+        exit;
+    }
+    if (!isAdmin()) {
+        debugLog("Unauthorized access to redeem_loyalty_points", 'api_debug.log');
+        echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+        exit;
+    }
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!$data || !isset($data['customer_id']) || !isset($data['points_to_redeem']) || !isset($data['csrf_token'])) {
+        debugLog("Missing parameters for redeem_loyalty_points", 'api_debug.log');
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid request']);
+        exit;
+    }
+    if (!validateCsrfToken($data['csrf_token'])) {
+        debugLog("Invalid CSRF token for redeem_loyalty_points", 'api_debug.log');
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+        exit;
+    }
+    $customer_id = (int)$data['customer_id'];
+    $points_to_redeem = (int)$data['points_to_redeem'];
+    if ($customer_id <= 0 || $points_to_redeem <= 0) {
+        debugLog("Invalid customer_id: $customer_id or points_to_redeem: $points_to_redeem", 'api_debug.log');
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid customer ID or points']);
+        exit;
+    }
+    try {
+        $stmt = $pdo->prepare("SELECT loyalty_points FROM customers WHERE id = ?");
+        $stmt->execute([$customer_id]);
+        $current_points = $stmt->fetchColumn();
+        if ($current_points === false) {
+            debugLog("Customer not found: $customer_id", 'api_debug.log');
+            echo json_encode(['success' => false, 'message' => 'Customer not found']);
+            exit;
+        }
+        if ($current_points < $points_to_redeem) {
+            debugLog("Insufficient points for customer_id: $customer_id, current: $current_points, requested: $points_to_redeem", 'api_debug.log');
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Insufficient loyalty points']);
+            exit;
+        }
+        $stmt = $pdo->prepare("UPDATE customers SET loyalty_points = loyalty_points - ? WHERE id = ?");
+        $stmt->execute([$points_to_redeem, $customer_id]);
+        $discount_amount = $points_to_redeem / 100; // Define explicitly or use POINTS_REDEMPTION_RATE
+        debugLog("Redeemed $points_to_redeem points for customer_id: $customer_id, discount: $discount_amount", 'api_debug.log');
+        echo json_encode(['success' => true, 'new_points' => $current_points - $points_to_redeem, 'discount_amount' => $discount_amount]);
+    } catch (PDOException $e) {
+        debugLog("Database error in redeem_loyalty_points: " . $e->getMessage(), 'api_debug.log');
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Database error']);
+    }
+    break;
+
+            case 'login':
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        debugLog("Invalid request method for login: {$_SERVER['REQUEST_METHOD']}");
+        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+        exit;
+    }
+
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!$data || empty($data['username']) || empty($data['password']) || empty($data['csrf_token'])) {
+        debugLog("Missing login parameters");
+        echo json_encode(['success' => false, 'message' => 'Missing parameters']);
+        exit;
+    }
+
+    if (!validateCsrfToken($data['csrf_token'])) {
+        debugLog("Invalid CSRF token for login attempt by {$data['username']}");
+        echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+        exit;
+    }
+
+    $username = $data['username'];
+    $password = $data['password'];
 
     try {
-        // Get parameters with validation
-        $days = isset($_GET['days']) ? (int)$_GET['days'] : 30;
-        $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-d', strtotime('-90 days'));
-        $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
+        $stmt = $pdo->prepare("SELECT id, username, password, role FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch();
 
-        // Validate inputs
-        if ($days <= 0) {
-            throw new Exception('Days to forecast must be greater than 0');
+        if ($user && $password === $user['password']) { // Plain text comparison (insecure)
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'];
+            $_SESSION['is_admin'] = ($user['role'] === 'admin' || $user['role'] === 'manager') ? 1 : 0;
+
+            // Generate new CSRF token for the session
+            $new_csrf_token = generateCsrfToken();
+            debugLog("Login successful for user: $username");
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Login successful',
+                'role' => $user['role'],
+                'csrf_token' => $new_csrf_token
+            ]);
+        } else {
+            debugLog("Login failed for user: $username - Invalid credentials");
+            echo json_encode(['success' => false, 'message' => 'Invalid username or password']);
+        }
+    } catch (PDOException $e) {
+        debugLog("Login error for user $username: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Database error']);
+    }
+    exit;
+
+
+   case 'get_product_catalog':
+    try {
+        $search = isset($_GET['search']) ? '%' . trim($_GET['search']) . '%' : '%';
+        $category_id = isset($_GET['category_id']) && is_numeric($_GET['category_id']) ? (int)$_GET['category_id'] : null;
+        $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+        $perPage = isset($_GET['per_page']) && is_numeric($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
+        $offset = ($page - 1) * $perPage;
+
+        $where = ["(p.name LIKE ? OR p.barcode LIKE ?)", "p.quantity > 0"];
+        $params = [$search, $search];
+
+        if ($category_id !== null) {
+            $where[] = "p.category_id = ?";
+            $params[] = $category_id;
         }
 
-        if (!strtotime($start_date) || !strtotime($end_date)) {
-            throw new Exception('Invalid date format');
-        }
+        $where_clause = count($where) > 0 ? "WHERE " . implode(" AND ", $where) : "";
 
-        if (strtotime($end_date) < strtotime($start_date)) {
-            throw new Exception('End date must be after start date');
-        }
+        // Count query
+        $count_query = "SELECT COUNT(*) 
+                        FROM products p 
+                        LEFT JOIN categories c ON p.category_id = c.id 
+                        $where_clause";
+        $countStmt = $pdo->prepare($count_query);
+        $countStmt->execute($params);
+        $total = $countStmt->fetchColumn();
 
-        // Calculate date ranges
-        $history_start = $start_date;
-        $history_end = $end_date;
-        $forecast_start = date('Y-m-d', strtotime($end_date . ' +1 day'));
-        $forecast_end = date('Y-m-d', strtotime($end_date . " +$days days"));
-
-        // Get historical sales data
-        $query = "SELECT 
-                    p.id,
-                    p.name AS product_name,
-                    c.name AS category_name,
-                    SUM(si.quantity) AS historical_sales,
-                    COUNT(DISTINCT DATE(si.sale_date)) AS days_with_sales
-                  FROM sale_items si
-                  JOIN products p ON si.product_id = p.id
-                  LEFT JOIN categories c ON p.category_id = c.id
-                  JOIN sales_header sh ON si.sale_id = sh.id
-                  WHERE sh.sale_date BETWEEN ? AND ?
-                  GROUP BY p.id, p.name, c.name
-                  HAVING historical_sales > 0
-                  ORDER BY historical_sales DESC
-                  LIMIT 50"; // Limit to top 50 products
-
+        // Main query
+        $query = "SELECT p.id, p.name, p.quantity, p.price, p.barcode, 
+                         COALESCE(p.image, 'no-image.jpg') as products_image, 
+                         c.name as category_name, p.description
+                  FROM products p 
+                  LEFT JOIN categories c ON p.category_id = c.id 
+                  $where_clause 
+                  ORDER BY p.name ASC 
+                  LIMIT ?, ?";
         $stmt = $pdo->prepare($query);
-        $stmt->execute([$history_start . ' 00:00:00', $history_end . ' 23:59:59']);
+        // Bind parameters for WHERE clause
+        for ($i = 0; $i < count($params); $i++) {
+            $stmt->bindValue($i + 1, $params[$i]);
+        }
+        // Bind LIMIT parameters as integers
+        $stmt->bindParam(count($params) + 1, $offset, PDO::PARAM_INT);
+        $stmt->bindParam(count($params) + 2, $perPage, PDO::PARAM_INT);
+        $stmt->execute();
         $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if (empty($products)) {
-            echo json_encode(['status' => 'success', 'forecasts' => [], 'message' => 'No sales data available for forecasting']);
+        debugLog("get_product_catalog: Fetched $total products, page=$page, per_page=$perPage", 'api_debug.log');
+
+        sendJsonResponse(200, [
+            'products' => $products,
+            'total' => $total,
+            'page' => $page,
+            'per_page' => $perPage,
+            'total_pages' => ceil($total / $perPage)
+        ]);
+    } catch (PDOException $e) {
+        debugLog("PDO Error in get_product_catalog: " . $e->getMessage() . " | Query: $query | Params: " . json_encode($params + ['offset' => $offset, 'perPage' => $perPage]), 'api_debug.log');
+        sendJsonResponse(500, ['error' => 'Database error: ' . $e->getMessage()]);
+    } catch (Exception $e) {
+        debugLog("General Error in get_product_catalog: " . $e->getMessage(), 'api_debug.log');
+        sendJsonResponse(500, ['error' => 'Failed to fetch products: ' . $e->getMessage()]);
+    }
+    break;
+
+ case 'add_to_cart':
+    try {
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!isset($data['product_id'], $data['quantity']) || !is_numeric($data['product_id']) || !is_numeric($data['quantity'])) {
+            sendJsonResponse(400, ['error' => 'Invalid input']);
+            exit;
+        }
+        $product_id = (int)$data['product_id'];
+        $quantity = (int)$data['quantity'];
+
+        $stmt = $pdo->prepare("SELECT name, price, quantity, barcode, image FROM products WHERE id = ? AND quantity >= ?");
+        $stmt->execute([$product_id, $quantity]);
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$product) {
+            sendJsonResponse(400, ['error' => 'Product not found or insufficient stock']);
             exit;
         }
 
-        // Calculate forecasts
-        $forecasts = [];
-        foreach ($products as $product) {
-            $sales_per_day = $product['historical_sales'] / max(1, $product['days_with_sales']);
-            $predicted_sales = round($sales_per_day * $days);
+        $cart = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
+        $cart[$product_id] = [
+            'id' => $product_id,
+            'name' => $product['name'],
+            'price' => $product['price'],
+            'quantity' => ($cart[$product_id]['quantity'] ?? 0) + $quantity,
+            'barcode' => $product['barcode'],
+            'image' => $product['image'] ?? 'no-image.jpg'
+        ];
+
+        $_SESSION['cart'] = $cart;
+        sendJsonResponse(200, ['message' => 'Product added to cart', 'cart' => array_values($cart)]);
+    } catch (Exception $e) {
+        debugLog('Error in add_to_cart: ' . $e->getMessage());
+        sendJsonResponse(500, ['error' => 'Failed to add to cart']);
+    }
+    break;
+
+ case 'get_cart_contents':
+    try {
+        session_start();
+        $cart = $_SESSION['cart'] ?? [];
+        $contents = [];
+        $subtotal = 0;
+        $tax_rate = 0.05; // 5% tax
+        $tax_amount = 0;
+        
+        foreach ($cart as $item) {
+            // Re-validate stock
+            $stmt = $pdo->prepare("SELECT quantity FROM products WHERE id = ?");
+            $stmt->execute([$item['id']]);
+            $product = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            $forecasts[] = [
-                'product_id' => $product['id'],
-                'product_name' => $product['product_name'],
-                'category_name' => $product['category_name'],
-                'historical_sales' => (int)$product['historical_sales'],
-                'sales_per_day' => round($sales_per_day, 2),
-                'predicted_sales' => $predicted_sales,
-                'confidence' => min(100, max(10, round($product['days_with_sales'] / $days * 100))), // Confidence score
-                'history_start_date' => $history_start,
-                'history_end_date' => $history_end,
-                'forecast_start_date' => $forecast_start,
-                'forecast_end_date' => $forecast_end
-            ];
+            if (!$product || $product['quantity'] < $item['quantity']) {
+                $item['quantity'] = min($item['quantity'], $product['quantity'] ?? 0);
+                $_SESSION['cart'][$item['id']]['quantity'] = $item['quantity'];
+                $_SESSION['cart'][$item['id']]['maxQuantity'] = $product['quantity'] ?? 0;
+            }
+            
+            if ($item['quantity'] > 0) {
+                $item_subtotal = $item['price'] * $item['quantity'];
+                $subtotal += $item_subtotal;
+                $contents[] = [
+                    'product_id' => $item['id'],
+                    'name' => $item['name'],
+                    'price' => $item['price'],
+                    'quantity' => $item['quantity'],
+                    'subtotal' => $item_subtotal,
+                    'image' => $item['image'],
+                    'barcode' => $item['barcode'],
+                    'maxQuantity' => $item['maxQuantity']
+                ];
+            }
         }
-
-        // Return the forecast data
+        
+        // Remove items with zero quantity
+        $_SESSION['cart'] = array_filter($_SESSION['cart'], function($item) {
+            return $item['quantity'] > 0;
+        });
+        
+        $tax_amount = $subtotal * $tax_rate;
+        $total = $subtotal + $tax_amount;
+        
         echo json_encode([
-            'status' => 'success',
-            'forecasts' => $forecasts,
-            'history_period' => "$history_start to $history_end",
-            'forecast_period' => "$forecast_start to $forecast_end",
-            'days_forecasted' => $days
+            'success' => true,
+            'contents' => array_values($contents),
+            'subtotal' => $subtotal,
+            'tax_amount' => $tax_amount,
+            'total' => $total,
+            'cart_count' => count($contents)
         ]);
-
+        debugLog("Fetched cart contents: items=" . count($contents), 'api_debug.log');
     } catch (Exception $e) {
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        debugLog("Error in get_cart_contents: " . $e->getMessage(), 'api_debug.log');
+        echo json_encode(['success' => false, 'message' => 'Error fetching cart']);
     }
     break;
 
-case 'update_stock_adjustment':
-    if (!isAdmin()) {
-        echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
-        exit;
-    }
-
-    $data = json_decode(file_get_contents('php://input'), true);
-    $id = intval($data['id'] ?? 0);
-    $product_id = intval($data['product_id'] ?? 0);
-    $adjustment_value = intval($data['adjustment_value'] ?? 0);
-    $reason_id = !empty($data['reason_id']) ? intval($data['reason_id']) : null;
-    $notes = trim($data['notes'] ?? '');
-    $csrf_token = $data['csrf_token'] ?? '';
-
-    if (!validateCsrfToken($csrf_token)) {
-        echo json_encode(['status' => 'error', 'message' => 'Invalid CSRF token']);
-        exit;
-    }
-
-    if ($id <= 0 || $product_id <= 0 || $adjustment_value === 0) {
-        echo json_encode(['status' => 'error', 'message' => 'Invalid data provided']);
-        exit;
-    }
-
+ case 'update_cart_item':
     try {
-        $pdo->beginTransaction();
-
-        // Fetch the existing adjustment
-        $stmt = $pdo->prepare("SELECT * FROM stock_adjustments WHERE id = ? FOR UPDATE");
-        $stmt->execute([$id]);
-        $adjustment = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$adjustment) {
-            throw new Exception("Adjustment not found");
+        $data = json_decode(file_get_contents('php://input'), true);
+        $product_id = (int)($data['product_id'] ?? 0);
+        $quantity = (int)($data['quantity'] ?? 0);
+        $csrf_token = $data['csrf_token'] ?? '';
+        
+        if (!validateCsrfToken($csrf_token)) {
+            throw new Exception('Invalid CSRF token');
         }
-
-        // Get current product quantity
-        $stmt = $pdo->prepare("SELECT quantity FROM products WHERE id = ? FOR UPDATE");
+        
+        if ($product_id <= 0 || $quantity < 0) {
+            throw new Exception('Invalid product ID or quantity');
+        }
+        
+        session_start();
+        if (!isset($_SESSION['cart']) || !isset($_SESSION['cart'][$product_id])) {
+            throw new Exception('Product not in cart');
+        }
+        
+        $stmt = $pdo->prepare("SELECT quantity FROM products WHERE id = ?");
         $stmt->execute([$product_id]);
         $product = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$product) {
-            throw new Exception("Product not found");
+        
+        if (!$product || $product['quantity'] < $quantity) {
+            throw new Exception('Requested quantity exceeds available stock');
         }
-
-        // Revert the old adjustment
-        $old_adjustment_value = intval($adjustment['adjustment_value']);
-        $current_qty = intval($product['quantity']);
-        $reverted_qty = $current_qty - $old_adjustment_value;
-
-        // Apply the new adjustment
-        $new_qty = $reverted_qty + $adjustment_value;
-        if ($new_qty < 0) {
-            throw new Exception("Adjustment would result in negative inventory");
+        
+        if ($quantity == 0) {
+            unset($_SESSION['cart'][$product_id]);
+        } else {
+            $_SESSION['cart'][$product_id]['quantity'] = $quantity;
+            $_SESSION['cart'][$product_id]['maxQuantity'] = $product['quantity'];
         }
-
-        // Update the adjustment record
-        $stmt = $pdo->prepare("UPDATE stock_adjustments SET product_id = ?, quantity_before = ?, quantity_after = ?, adjustment_value = ?, reason_id = ?, notes = ?, adjusted_by = ? WHERE id = ?");
-        $stmt->execute([
-            $product_id,
-            $reverted_qty,
-            $new_qty,
-            $adjustment_value,
-            $reason_id,
-            $notes,
-            $_SESSION['user_id'],
-            $id
-        ]);
-
-        // Update product quantity
-        $stmt = $pdo->prepare("UPDATE products SET quantity = ? WHERE id = ?");
-        $stmt->execute([$new_qty, $product_id]);
-
-        $pdo->commit();
-
-        // Clear relevant caches
-        clearCache('get_products_*');
-        clearCache('get_available_products_*');
-        clearCache('get_low_stock_products_*');
-
-        echo json_encode(['success' => true]);
+        
+        debugLog("Updated cart item: product_id=$product_id, quantity=$quantity", 'api_debug.log');
+        echo json_encode(['success' => true, 'cart_count' => count($_SESSION['cart'])]);
     } catch (Exception $e) {
-        $pdo->rollBack();
+        debugLog("Error in update_cart_item: " . $e->getMessage(), 'api_debug.log');
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
     break;
 
-case 'delete_stock_adjustment':
-    if (!isAdmin()) {
-        echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
-        exit;
-    }
-
-    $data = json_decode(file_get_contents('php://input'), true);
-    $id = intval($data['id'] ?? 0);
-    $csrf_token = $data['csrf_token'] ?? '';
-
-    if (!validateCsrfToken($csrf_token)) {
-        echo json_encode(['status' => 'error', 'message' => 'Invalid CSRF token']);
-        exit;
-    }
-
-    if ($id <= 0) {
-        echo json_encode(['status' => 'error', 'message' => 'Invalid adjustment ID']);
-        exit;
-    }
-
+    case 'remove_from_cart':
     try {
-        $pdo->beginTransaction();
-
-        // Fetch the adjustment
-        $stmt = $pdo->prepare("SELECT * FROM stock_adjustments WHERE id = ? FOR UPDATE");
-        $stmt->execute([$id]);
-        $adjustment = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$adjustment) {
-            throw new Exception("Adjustment not found");
+        $input = json_decode(file_get_contents('php://input'), true);
+        validateCsrfToken($input['csrf_token']);
+        
+        $product_id = (int)($input['product_id'] ?? 0);
+        
+        if ($product_id <= 0) {
+            throw new Exception('Invalid product ID');
         }
-
-        // Revert the adjustment
-        $product_id = $adjustment['product_id'];
-        $adjustment_value = intval($adjustment['adjustment_value']);
-        $stmt = $pdo->prepare("SELECT quantity FROM products WHERE id = ? FOR UPDATE");
-        $stmt->execute([$product_id]);
-        $product = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$product) {
-            throw new Exception("Product not found");
+        
+        session_start();
+        if (isset($_SESSION['cart'][$product_id])) {
+            unset($_SESSION['cart'][$product_id]);
         }
-
-        $current_qty = intval($product['quantity']);
-        $new_qty = $current_qty - $adjustment_value;
-        if ($new_qty < 0) {
-            throw new Exception("Reverting adjustment would result in negative inventory");
-        }
-
-        // Update product quantity
-        $stmt = $pdo->prepare("UPDATE products SET quantity = ? WHERE id = ?");
-        $stmt->execute([$new_qty, $product_id]);
-
-        // Delete the adjustment
-        $stmt = $pdo->prepare("DELETE FROM stock_adjustments WHERE id = ?");
-        $stmt->execute([$id]);
-
-        $pdo->commit();
-
-        // Clear relevant caches
-        clearCache('get_products_*');
-        clearCache('get_available_products_*');
-        clearCache('get_low_stock_products_*');
-
-        echo json_encode(['success' => true]);
+        
+        debugLog("Removed from cart: product_id=$product_id", 'api_debug.log');
+        echo json_encode(['success' => true, 'cart_count' => count($_SESSION['cart'])]);
     } catch (Exception $e) {
-        $pdo->rollBack();
-        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-    }
-    break;
-
-case 'get_adjustment_reasons':
-    if (!isAdmin()) {
-        echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
-        exit;
-    }
-    try {
-        $stmt = $pdo->query("SELECT id, name FROM adjustment_reasons ORDER BY name ASC");
-        $reasons = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode($reasons);
-    } catch (Exception $e) {
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
-    }
-    break;
-
-case 'process_stock_adjustment':
-    if (!isAdmin()) {
-        echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
-        exit;
-    }
-
-    $data = json_decode(file_get_contents('php://input'), true);
-    $product_id = intval($data['product_id'] ?? 0);
-    $adjustment_value = intval($data['adjustment_value'] ?? 0);
-    $reason_id = !empty($data['reason_id']) ? intval($data['reason_id']) : null;
-    $notes = trim($data['notes'] ?? '');
-    $csrf_token = $data['csrf_token'] ?? '';
-
-    if (!validateCsrfToken($csrf_token)) {
-        echo json_encode(['status' => 'error', 'message' => 'Invalid CSRF token']);
-        exit;
-    }
-
-    if ($product_id <= 0 || $adjustment_value === 0 || !$reason_id) {
-        echo json_encode(['status' => 'error', 'message' => 'Invalid data provided']);
-        exit;
-    }
-
-    try {
-        $pdo->beginTransaction();
-
-        // Get current product quantity
-        $stmt = $pdo->prepare("SELECT quantity FROM products WHERE id = ? FOR UPDATE");
-        $stmt->execute([$product_id]);
-        $product = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$product) {
-            throw new Exception("Product not found");
-        }
-
-        $current_qty = intval($product['quantity']);
-        $new_qty = $current_qty + $adjustment_value;
-
-        if ($new_qty < 0) {
-            throw new Exception("Adjustment would result in negative inventory");
-        }
-
-        // Insert the adjustment record
-        $stmt = $pdo->prepare("INSERT INTO stock_adjustments (product_id, quantity_before, quantity_after, adjustment_value, reason_id, notes, adjusted_by, adjusted_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
-        $stmt->execute([
-            $product_id,
-            $current_qty,
-            $new_qty,
-            $adjustment_value,
-            $reason_id,
-            $notes,
-            $_SESSION['user_id']
-        ]);
-
-        // Update product quantity
-        $stmt = $pdo->prepare("UPDATE products SET quantity = ? WHERE id = ?");
-        $stmt->execute([$new_qty, $product_id]);
-
-        $pdo->commit();
-
-        // Clear relevant caches
-        clearCache('get_products_*');
-        clearCache('get_available_products_*');
-        clearCache('get_low_stock_products_*');
-        clearCache('get_stock_adjustments*'); // Add this to clear stock adjustments cache
-
-        echo json_encode(['success' => true]);
-    } catch (Exception $e) {
-        $pdo->rollBack();
+        debugLog("Error in remove_from_cart: " . $e->getMessage(), 'api_debug.log');
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
     break;
 
 
-    
 }
+    
+
+
+
 ?>

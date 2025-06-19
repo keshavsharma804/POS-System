@@ -70,37 +70,21 @@ try {
     debugLog("Error creating discounts table: " . $e->getMessage());
 }
 
-function isAdmin() {
-    return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
-}
+
 
 function isClient() {
     return isset($_SESSION['role']) && $_SESSION['role'] === 'client';
 }
 
-function getCsrfToken() {
-    if (!isset($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-    return $_SESSION['csrf_token'];
-}
+
 
 function validateCsrfToken($token) {
     return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
 }
 
-function regenerateCsrfToken() {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    return $_SESSION['csrf_token'];
-}
 
-// CSRF Token Generation
-function generateCsrfToken() {
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-    return $_SESSION['csrf_token'];
-}
+
+
 
 
 function getLowStockThreshold() {
@@ -328,26 +312,7 @@ try {
     debugLog("Error creating sale_discounts table: " . $e->getMessage());
 }
 
-try {
-    $pdo->exec("CREATE TABLE IF NOT EXISTS discounts (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        type ENUM('percentage', 'fixed') NOT NULL,
-        value DECIMAL(10,2) NOT NULL,
-        product_id INT NULL,
-        category_id INT NULL,
-        start_date DATETIME NOT NULL,
-        end_date DATETIME NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        min_purchase_amount DECIMAL(10,2) NULL DEFAULT NULL,
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL,
-        FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
-        INDEX idx_validity (start_date, end_date)
-    ) ENGINE=InnoDB");
-    debugLog("Discounts table initialized");
-} catch (PDOException $e) {
-    debugLog("Error creating discounts table: " . $e->getMessage());
-}
+
 
 // Ensure min_purchase_amount column exists
 try {
@@ -435,14 +400,47 @@ try {
     debugLog("Error creating stock_adjustments table: " . $e->getMessage());
 }
 
-try {
-    $pdo->exec("CREATE TABLE IF NOT EXISTS categories (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100) NOT NULL UNIQUE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB");
-    debugLog("categories table initialized");
-} catch (PDOException $e) {
-    debugLog("Error creating categories table: " . $e->getMessage());
+function clearCachePattern($pattern) {
+    $cacheDir = __DIR__ . '/Cache/';
+    try {
+        $files = glob($cacheDir . '*.cache');
+        foreach ($files as $file) {
+            $key = str_replace('.cache', '', basename($file));
+            if (fnmatch(md5($pattern), $key)) {
+                if (unlink($file)) {
+                    debugLog("Cache cleared for pattern: $pattern, file: $key");
+                } else {
+                    debugLog("Failed to clear cache for pattern: $pattern, file: $key");
+                }
+            }
+        }
+    } catch (Exception $e) {
+        debugLog("Cache clear pattern error for $pattern: " . $e->getMessage());
+    }
 }
+
+
+
+function isAdmin() {
+    return isset($_SESSION['user_id']) && $_SESSION['is_admin'] == 1;
+}
+
+function getCsrfToken() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function generateCsrfToken() {
+    return getCsrfToken();
+}
+
+// Loyalty Program Configuration
+define('POINTS_PER_DOLLAR', 1); // 1 point per $1 spent
+define('POINTS_REDEMPTION_RATE', 100); // 100 points = $1 discount
+
+// Supported payment methods
+define('SUPPORTED_PAYMENT_METHODS', ['Cash', 'Credit Card', 'Loyalty Points']);
+
 ?>

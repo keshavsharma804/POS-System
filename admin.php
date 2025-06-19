@@ -33,32 +33,221 @@ $csrf_token = getCsrfToken();
         .nav-link { cursor: pointer; }
         .section { display: none; }
         .section.active { display: block; }
-        .autocomplete-suggestions {
-            position: absolute;
-            z-index: 1000;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            width: calc(100% - 30px);
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .autocomplete-item {
-            padding: 8px;
-            cursor: pointer;
-        }
-        .autocomplete-item:hover {
-            background-color: #f0f4f8;
-        }
 
-        .list-group.position-absolute {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .list-group-item:hover {
-            background-color: #f0f4f8;
-            cursor: pointer;
-        }
+
+        /* Replace the existing .autocomplete-suggestions styles with these: */
+.autocomplete-suggestions {
+    position: absolute;
+    top: 100%; /* Align directly below input */
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ddd;
+    border-top: none; /* Remove top border for seamless attachment */
+    border-radius: 0 0 4px 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin: 0; /* Remove any margin */
+    padding: 0;
+}
+
+.autocomplete-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Add this for the input group container */
+.input-group.autocomplete-container {
+    position: relative;
+    z-index: 1001; /* Ensure container is above other elements */
+}
+
+
+/* Product Catalog Styles */
+/* Product Catalog Styles */
+#product-catalog .card {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+#product-catalog .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+#product-catalog .product-img-container {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    overflow: hidden;
+    border-bottom: 1px solid #e9ecef;
+}
+
+#product-catalog .product-img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    padding: 10px;
+}
+
+#product-catalog .card-body {
+    padding: 1.5rem;
+}
+
+#product-catalog .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+#product-catalog .card-text {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+    height: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#product-catalog .product-stock {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+#product-catalog .in-stock {
+    color: #28a745;
+}
+
+#product-catalog .out-of-stock {
+    color: #dc3545;
+}
+
+#product-catalog .input-group {
+    margin-top: 1rem;
+}
+
+#product-catalog .add-to-cart-btn {
+    white-space: nowrap;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+}
+
+.add-to-cart-btn {
+    white-space: nowrap;
+}
+
+/* Cart Styles */
+#cartCountBadge {
+    font-size: 0.8rem;
+    vertical-align: middle;
+}
+
+#selectedCartCustomer {
+    min-height: 60px;
+}
+
+.toast {
+    max-width: 350px;
+}
+
+
+/* Product Catalog Styles */
+#productGrid {
+    min-height: 500px;
+}
+
+.product-card {
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.product-img-container {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    padding: 15px;
+}
+
+.product-img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.product-stock {
+    font-size: 0.9rem;
+}
+
+.in-stock {
+    color: #28a745;
+}
+
+.out-of-stock {
+    color: #dc3545;
+}
+
+/* Cart Styles */
+#cartItems img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.cart-item-name {
+    font-weight: 500;
+}
+
+.quantity-control {
+    width: 120px;
+}
+
+.remove-item-btn {
+    color: #dc3545;
+    cursor: pointer;
+}
+
+#customerSearchResults {
+    max-height: 200px;
+    overflow-y: auto;
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+    display: none;
+}
+
+.payment-method {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Toast Notification */
+.toast-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1100;
+}
     </style>
 </head>
 <body>
@@ -74,13 +263,14 @@ $csrf_token = getCsrfToken();
                         <a class="nav-link active" data-section="dashboard">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-section="sales">Sales</a>
+                        <a class="nav-link" data-section="product-catalog">Product Catalog</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" data-section="sales-forecasting">Sales Forecasting</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" data-section="sales-report">Sales Report</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-section="sales-forecastin">Sales Forecasting</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" data-section="most-sold-products">Most Sold Products</a>
@@ -97,9 +287,19 @@ $csrf_token = getCsrfToken();
                     <li class="nav-item">
                            <a class="nav-link" data-section="customers">Customers</a>
                        </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-danger" href="logout.php">Logout</a>
-                    </li>
+
+                                            <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" data-section="cart-section">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span id="cartItemCountBadge" class="badge bg-danger rounded-pill">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" href="logout.php">Logout</a>
+                        </li>
+                    </ul>
+                 
                 </ul>
             </div>
         </div>
@@ -172,67 +372,243 @@ $csrf_token = getCsrfToken();
             </div>
         </div>
 
-        <!-- Sales Section -->
-        <div id="sales" class="section">
+
+       <!-- Product Catalog Section -->
+<!-- Product Catalog Section -->
+<div id="product-catalog" class="section">
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Product Catalog</h2>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="input-group autocomplete-container">
+                        <input type="text" id="productSearch" class="form-control" placeholder="Search by name or barcode...">
+                        <button class="btn btn-primary" id="searchProductsBtn">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                    <div id="productSuggestions" class="autocomplete-suggestions" style="display: none;"></div>
+                </div>
+                <div class="col-md-4">
+                    <select id="productCategoryFilter" class="form-control">
+                        <option value="">All Categories</option>
+                        <?php
+                        $stmt = $pdo->query("SELECT id, name FROM categories");
+                        while ($category = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            echo "<option value=\"{$category['id']}\">" . htmlspecialchars($category['name']) . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-outline-secondary w-100" id="resetFiltersBtn">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                </div>
+            </div>
+            <div class="row" id="productGrid">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Loading products...</p>
+                </div>
+            </div>
+            <div id="pagination-controls" class="text-center mt-3"></div>
+        </div>
+    </div>
+</div>
+
+      <!-- Cart Section -->
+<div id="cart-section" class="section">
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="card-title mb-0">Shopping Cart</h2>
+                <span class="badge bg-primary rounded-pill" id="cartItemCount">0 items</span>
+            </div>
+            
+            <!-- Customer Selection -->
             <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Customer Information</h5>
+                </div>
                 <div class="card-body">
-                    <h2 class="card-title">Create New Sale</h2>
-                    <input type="hidden" id="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-2">
-                                <label for="clientSearchBar" class="form-label">Search Client (by Username)</label>
-                                <div class="input-group position-relative">
-                                    <input type="text" id="clientSearchBar" class="form-control" placeholder="Type client name..." autocomplete="off">
-                                    <div id="clientSuggestions" class="autocomplete-suggestions"></div>
-                                </div>
+                        <div class="col-md-8">
+                            <div class="input-group mb-3">
+                                <input type="text" id="cartCustomerSearch" class="form-control" placeholder="Search customer by name, email or phone">
+                                <button class="btn btn-outline-secondary" type="button" id="searchCustomerBtn">
+                                    <i class="fas fa-search"></i>
+                                </button>
                             </div>
-                            <div id="selectedClient" class="mb-3"></div>
+                            <div id="customerSearchResults" class="list-group" style="display: none;"></div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-2">
-                                <label for="productSearchBar" class="form-label">Search Product (by Name or Barcode)</label>
-                                <div class="input-group position-relative">
-                                    <input type="text" id="productSearchBar" class="form-control" placeholder="Type product name/barcode..." autocomplete="off">
-                                    <div id="productSuggestions" class="autocomplete-suggestions"></div>
+                    
+                    <div id="selectedCustomerInfo" class="mt-3 p-3 bg-light rounded" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 id="selectedCustomerName"></h6>
+                                <small class="text-muted" id="selectedCustomerDetails"></small>
+                                <div class="mt-2">
+                                    <span class="badge bg-info" id="selectedCustomerPoints">0 points</span>
                                 </div>
                             </div>
-                            <div id="productResult" class="mb-3">
-                                <div id="selectedProduct"></div>
-                                <div class="d-flex align-items-center">
-                                    <label for="quantity" class="me-2">Quantity:</label>
-                                    <input type="number" id="quantity" class="form-control d-inline-block" style="width: 100px;" min="1" value="1">
-                                    <button id="addToCartBtn" class="btn btn-success ms-2">Add to Cart</button>
-                                </div>
-                            </div>
+                            <button class="btn btn-sm btn-danger" id="removeCustomerBtn">
+                                <i class="fas fa-times"></i> Remove
+                            </button>
                         </div>
-                    </div>
-                    <div class="table-responsive mt-4">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Product Name</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th>Total</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cartTable"></tbody>
-                        </table>
-                    </div>
-                    <div class="text-end">
-                        <h4>Subtotal: $<span id="subtotal">0.00</span></h4>
-                        <h4>Discount: $<span id="discount">0.00</span></h4>
-                        <h4>Tax (5%): $<span id="tax">0.00</span></h4>
-                        <h4>Total: $<span id="cartTotal">0.00</span></h4>
-                        <button id="checkoutBtn" class="btn btn-primary mt-3">Checkout</button>
                     </div>
                 </div>
             </div>
+            
+            <!-- Cart Items -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Cart Items</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="50%">Product</th>
+                                    <th width="15%">Price</th>
+                                    <th width="20%">Quantity</th>
+                                    <th width="15%">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cartItems">
+                                <tr>
+                                    <td colspan="4" class="text-center py-5">Your cart is empty</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Summary -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="loyaltyPointsToUse" placeholder="Points to use" min="0" value="0">
+                                <button class="btn btn-primary" id="applyLoyaltyPoints">
+                                    Apply Points
+                                </button>
+                            </div>
+                            <small class="text-muted" id="loyaltyPointsNote">100 points = $1 discount</small>
+                        </div>
+                    </div>
+                    
+                    <div class="border-top pt-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span id="cartSubtotal">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Discount:</span>
+                            <span id="cartDiscount">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tax (5%):</span>
+                            <span id="cartTax">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between fw-bold fs-5">
+                            <span>Total:</span>
+                            <span id="cartTotal">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Payment Methods -->
+            <div class="card mb-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Payment Methods</h5>
+                    <button class="btn btn-sm btn-success" id="addPaymentMethodBtn">
+                        <i class="fas fa-plus"></i> Add Payment
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="paymentMethods">
+                        <div class="payment-method mb-3">
+                            <div class="row g-2">
+                                <div class="col-md-5">
+                                    <select class="form-control payment-type">
+                                        <option value="cash">Cash</option>
+                                        <option value="credit_card">Credit Card</option>
+                                        <option value="debit_card">Debit Card</option>
+                                        <option value="loyalty_points">Loyalty Points</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="number" class="form-control payment-amount" placeholder="Amount" min="0" step="0.01">
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-danger w-100 remove-payment" disabled>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="border-top pt-3 mt-3">
+                        <div class="d-flex justify-content-between fw-bold">
+                            <span>Total Paid:</span>
+                            <span id="totalPaid">$0.00</span>
+                        </div>
+                        <div class="text-end text-muted small">
+                            Remaining: <span id="remainingBalance">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Checkout Button -->
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary btn-lg" id="checkoutBtn" disabled>
+                    <i class="fas fa-check-circle"></i> Complete Checkout
+                </button>
+            </div>
         </div>
+    </div>
+</div>
+
+        <div id="sales-forecasting" class="section">
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Sales Forecasting</h2>
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label for="forecastStartDate" class="form-label">Start Date:</label>
+                    <input type="date" id="forecastStartDate" class="form-control" value="<?php echo date('Y-m-d', strtotime('-90 days')); ?>">
+                </div>
+                <div class="col-md-3">
+                    <label for="forecastEndDate" class="form-label">End Date:</label>
+                    <input type="date" id="forecastEndDate" class="form-control" value="<?php echo date('Y-m-d'); ?>">
+                </div>
+                <div class="col-md-3">
+                    <label for="forecastDays" class="form-label">Days to Forecast:</label>
+                    <input type="number" id="forecastDays" class="form-control" value="30" min="1">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button id="fetchForecastBtn" class="btn btn-primary">Generate Forecast</button>
+                </div>
+            </div>
+            <div class="chart-container" style="position: relative; height:400px; width:100%">
+                <canvas id="forecastChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
 
         <!-- Sales Report Section -->
         <div id="sales-report" class="section">
@@ -288,39 +664,6 @@ $csrf_token = getCsrfToken();
                 </div>
             </div>
         </div>
-
-
-
-                    <div id="sales-forecasting" class="section">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h2 class="card-title">Sales Forecasting</h2>
-                        <div class="row mb-3">
-                            <div class="col-md-3">
-                                <label for="forecastStartDate" class="form-label">Start Date:</label>
-                                <input type="date" id="forecastStartDate" class="form-control" value="<?php echo date('Y-m-d', strtotime('-90 days')); ?>">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="forecastEndDate" class="form-label">End Date:</label>
-                                <input type="date" id="forecastEndDate" class="form-control" value="<?php echo date('Y-m-d'); ?>">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="forecastDays" class="form-label">Days to Forecast:</label>
-                                <input type="number" id="forecastDays" class="form-control" value="30" min="1">
-                            </div>
-                            <div class="col-md-3 d-flex align-items-end">
-                                <button id="fetchForecastBtn" class="btn btn-primary">Generate Forecast</button>
-                            </div>
-                        </div>
-                        <div class="chart-container" style="position: relative; height:400px; width:100%">
-                            <canvas id="forecastChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-
 
         <!-- Most Sold Products Section -->
         <div id="most-sold-products" class="section">
@@ -509,51 +852,65 @@ $csrf_token = getCsrfToken();
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="productForm">
-                            <input type="hidden" id="productId">
-                            <div class="mb-3">
-                                <label for="productName" class="form-label">Name</label>
-                                <input type="text" class="form-control" id="productName" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="productCategory" class="form-label">Category</label>
-                                <select class="form-control" id="productCategory" required>
-                                    <option value="">Select Category</option>
-                                    <?php
-                                    $stmt = $pdo->query("SELECT id, name FROM categories");
-                                    while ($category = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                        echo "<option value=\"{$category['id']}\">" . htmlspecialchars($category['name']) . "</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="productPrice" class="form-label">Price</label>
-                                <input type="number" step="0.01" class="form-control" id="productPrice" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="productQuantity" class="form-label">Quantity</label>
-                                <input type="number" class="form-control" id="productQuantity" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="productBarcode" class="form-label">Barcode</label>
-                                <input type="text" class="form-control" id="productBarcode" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Save Product</button>
-                        </form>
+                       <form id="productForm">
+    <input type="hidden" id="productId">
+    <div class="mb-3">
+        <label for="productName" class="form-label">Name</label>
+        <input type="text" class="form-control" id="productName" required>
+    </div>
+    <div class="mb-3">
+        <label for="productCategory" class="form-label">Category</label>
+        <select class="form-control" id="productCategory" required>
+            <option value="">Select Category</option>
+            <?php
+            $stmt = $pdo->query("SELECT id, name FROM categories");
+            while ($category = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                echo "<option value=\"{$category['id']}\">" . htmlspecialchars($category['name']) . "</option>";
+            }
+            ?>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="productPrice" class="form-label">Price</label>
+        <input type="number" step="0.01" class="form-control" id="productPrice" required>
+    </div>
+    <div class="mb-3">
+        <label for="productQuantity" class="form-label">Quantity</label>
+        <input type="number" class="form-control" id="productQuantity" required>
+    </div>
+    <div class="mb-3">
+        <label for="productBarcode" class="form-label">Barcode</label>
+        <input type="text" class="form-control" id="productBarcode" required>
+    </div>
+    <div class="mb-3">
+        <label for="productImage" class="form-label">Image URL</label>
+        <input type="text" class="form-control" id="productImage" placeholder="e.g., images/product.jpg">
+    </div>
+    <div class="mb-3">
+        <label for="productDescription" class="form-label">Description</label>
+        <textarea class="form-control" id="productDescription" rows="4"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Save Product</button>
+</form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Customers Section -->
-<div id="customers" class="section" style="display: none;">
+
+
+<div id="customers" class="section">
     <div class="card mb-4">
         <div class="card-body">
             <h2 class="card-title">Customer Management</h2>
-            <div class="mb-3">
-                <input type="text" class="form-control" id="customerSearch" placeholder="Search by username or email...">
+            <div class="mb-3 d-flex align-items-center">
+                <div class="suggestion-container me-2" style="flex-grow: 1;">
+                    <input type="text" id="customerSearch" class="form-control" placeholder="Search customers by username or email" autocomplete="off">
+                    <div id="customerSuggestions" class="suggestion-dropdown" style="display: none;"></div>
+                </div>
+                <button id="customerSearchBtn" class="btn btn-primary me-2">Search</button>
+                <button id="addCustomerBtn" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#customerCreateModal">Add Customer</button>
             </div>
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -565,86 +922,170 @@ $csrf_token = getCsrfToken();
                             <th>Name</th>
                             <th>Phone</th>
                             <th>Address</th>
+                            <th>Loyalty Points</th>
                             <th>Joined</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="customerTable"></tbody>
+                    <tbody id="customerTableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Customer History Modal -->
+<!-- Customer History Modal (updated to remove Status column) -->
 <div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="customerModalLabel">Customer Purchase History</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <h6 id="customerInfo"></h6>
+                    <button id="downloadCustomerHistoryPdf" class="btn btn-primary btn-sm">Download PDF Report</button>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Date</th>
-                                <th>Total Amount</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyTable"></tbody>
-                    </table>
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Date</th>
+            <th>Products</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Subtotal</th>
+            <th>Tax (5%)</th>
+            <th>Final Amount</th>
+        </tr>
+    </thead>
+    <tbody id="historyTable"></tbody>
+</table>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<<!-- Stock Adjustments Section -->
+<!-- Customer Create Modal (unchanged) -->
+<div class="modal fade" id="customerCreateModal" tabindex="-1" aria-labelledby="customerCreateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="customerCreateModalLabel">Add Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="customerCreateForm">
+                    <div class="mb-3">
+                        <label for="createUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="createUsername" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="createEmail" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="createFirstName" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="createFirstName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="createLastName" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="createLastName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="createPhone" class="form-label">Phone</label>
+                        <input type="text" class="form-control" id="createPhone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="createAddress" class="form-label">Address</label>
+                        <textarea class="form-control" id="createAddress" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Customer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Customer Edit Modal (unchanged) -->
+<div class="modal fade" id="customerEditModal" tabindex="-1" aria-labelledby="customerEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="customerEditModalLabel">Edit Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="customerEditForm">
+                <input type="hidden" id="editCustomerId">
+                <div class="mb-3">
+                    <label for="editUsername" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="editUsername" required>
+                </div>
+                <div class="mb-3">
+                    <label for="editEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="editEmail" required>
+                </div>
+                <div class="mb-3">
+                    <label for="editFirstName" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="editFirstName">
+                </div>
+                <div class="mb-3">
+                    <label for="editLastName" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="editLastName">
+                </div>
+                <div class="mb-3">
+                    <label for="editPhone" class="form-label">Phone</label>
+                    <input type="text" class="form-control" id="editPhone">
+                </div>
+                <div class="mb-3">
+                    <label for="editAddress" class="form-label">Address</label>
+                    <textarea class="form-control" id="editAddress" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="editLoyaltyPoints" class="form-label">Loyalty Points</label>
+                    <input type="number" class="form-control" id="editLoyaltyPoints" readonly>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Stock Adjustments Section -->
 <div id="stock_adjustments" class="section">
     <div class="card mb-4">
         <div class="card-body">
-            <h2 class="card-title">Stock Adjustments</h2>
-
-            <!-- Filters -->
+            <h2 class="card-title">Stock Adjustment History</h2>
             <div class="row mb-3">
-                <div class="col-md-3 position-relative">
-                    <label for="adjustmentSearch" class="form-label">Search Product:</label>
-                    <input type="text" class="form-control" id="adjustmentSearch" placeholder="Search by product...">
+                <div class="col-md-4 position-relative">
+                    <input type="text" class="form-control" id="adjustmentSearch" placeholder="Search by product or reason...">
                     <ul id="suggestionList" class="list-group position-absolute w-100" style="display: none; z-index: 1000;"></ul>
                 </div>
-                <div class="col-md-3">
-                    <label for="adjustmentStartDate" class="form-label">Start Date:</label>
-                    <input type="date" class="form-control" id="adjustmentStartDate">
+                <div class="col-md-4">
+                    <input type="date" class="form-control" id="adjustmentStartDate" placeholder="Start Date">
                 </div>
-                <div class="col-md-3">
-                    <label for="adjustmentEndDate" class="form-label">End Date:</label>
-                    <input type="date" class="form-control" id="adjustmentEndDate">
-                </div>
-                <div class="col-md-3 d-flex align-items-end">
-                    <button id="exportAdjustmentsCsvBtn" class="btn btn-secondary w-100">Export CSV</button>
+                <div class="col-md-4 d-flex align-items-end">
+                    <input type="date" class="form-control me-2" id="adjustmentEndDate" placeholder="End Date">
+                    <button id="exportStockAdjustmentsCsvBtn" class="btn btn-secondary">Export CSV</button>
                 </div>
             </div>
-
-            <!-- Stock Adjustments Table -->
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Product</th>
-                            <th>Quantity Before</th>
+                            <th>Current Quantity</th>
                             <th>Adjustment</th>
-                            <th>Quantity After</th>
                             <th>Reason</th>
-                            <th>Notes</th>
                             <th>Adjusted By</th>
                             <th>Date</th>
-                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="adjustmentTable"></tbody>
@@ -652,84 +1093,119 @@ $csrf_token = getCsrfToken();
             </div>
         </div>
     </div>
-
-    <!-- Add/Edit Stock Adjustment Form -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h2 class="card-title" id="adjustmentFormTitle">Add New Stock Adjustment</h2>
-            <form id="adjustmentForm">
-                <div class="row mb-3">
-                    <div class="col-md-3 position-relative">
-                        <label for="adjustmentProduct" class="form-label">Product:</label>
-                        <input type="text" class="form-control" id="adjustmentProduct" placeholder="Search product..." required>
-                        <input type="hidden" id="adjustmentProductId">
-                        <ul id="adjustmentProductSuggestions" class="list-group position-absolute w-100" style="display: none; z-index: 1000;"></ul>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="adjustmentValue" class="form-label">Adjustment Value:</label>
-                        <input type="number" class="form-control" id="adjustmentValue" placeholder="e.g., +5 or -3" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="adjustmentReason" class="form-label">Reason:</label>
-                        <select class="form-control" id="adjustmentReason" required>
-                            <option value="">Select Reason</option>
-                            <?php
-                            $stmt = $pdo->query("SELECT id, name FROM adjustment_reasons ORDER BY name ASC");
-                            while ($reason = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                echo "<option value=\"{$reason['id']}\">" . htmlspecialchars($reason['name']) . "</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="adjustmentNotes" class="form-label">Notes (Optional):</label>
-                        <input type="text" class="form-control" id="adjustmentNotes" placeholder="Additional notes...">
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" id="submitAdjustmentBtn" class="btn btn-primary me-2">Add Adjustment</button>
-                        <button type="button" id="cancelEditBtn" class="btn btn-secondary" style="display: none;">Cancel</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+    
 </div>
+
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Navigation Toggle
-        const navLinks = document.querySelectorAll('.nav-link[data-section]');
-        const sections = document.querySelectorAll('.section');
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-                sections.forEach(s => s.classList.remove('active'));
-                const sectionId = link.dataset.section;
-                const section = document.getElementById(sectionId);
-                if (section) {
-                    section.classList.add('active');
-                    // Initialize section-specific data when shown
-                    if (sectionId === 'customers') {
-                        console.log('Calling fetchCustomers');
-                        fetchCustomers();
-                    }
-                    if (sectionId === 'stock_adjustments') {
-                        console.log('Calling fetchStockAdjustments');
-                        fetchStockAdjustments();
-                    }
-                    if (sectionId === 'dashboard') {
-                        fetchDashboardSummary();
-                        fetchDailySalesTrend();
-                        fetchLowStockProducts();
-                    } else if (sectionId === 'inventory') {
-                        fetchInventory();
-                    } else if (sectionId === 'discounts') {
-                        fetchDiscounts();
-                    }
-                }
-            });
-        });
+
+
+const salesStartDateInput = document.getElementById('salesStartDate');
+    const salesEndDateInput = document.getElementById('salesStartDate');
+    const salesSearchQueryInput = document.getElementById('salesSearchQuery');
+    const fetchSalesReportBtn = document.getElementById('fetchSalesReportBtn');
+    const exportSalesCsvBtn = document.getElementById('exportSalesCsvBtn');
+    const exportSalesPdfBtn = document.getElementById('exportSalesPdfBtn');
+    const salesReportTable = document.getElementById('salesReportTable');
+    const mostSoldStartDateInput = document.getElementById('mostSoldStartDate');
+    const mostSoldEndDateInput = document.getElementById('mostSoldEndDate');
+    const fetchMostSoldBtn = document.getElementById('fetchMostSoldBtn');
+    const exportMostSoldCsvBtn = document.getElementById('exportMostSoldCsvBtn');
+    const mostSoldTable = document.getElementById('mostSoldTable');
+    const inventoryTable = document.getElementById('inventoryTable');
+    const customerTableBody = document.getElementById('customerTableBody');
+    const adjustmentTable = document.getElementById('adjustmentTable');
+    const adjustmentSearch = document.getElementById('adjustmentSearch');
+    const adjustmentStartDate = document.getElementById('adjustmentStartDate');
+    const adjustmentEndDate = document.getElementById('adjustmentEndDate');
+    const suggestionList = document.getElementById('suggestionList');
+    const customerSearch = document.getElementById('customerSearch');
+    const customerSuggestions = document.getElementById('customerSuggestions');
+    const customerSearchBtn = document.getElementById('customerSearchBtn');
+    let salesTrendChart = null;
+    let cart = [];
+    let customerId = null;
+    let selectedProduct = null;
+    const POINTS_PER_DOLLAR = 1;
+    const TAX_RATE = 0.05;
+    const cartTable = document.getElementById('cartTable');
+    const subtotalElement = document.getElementById('subtotal');
+    const taxElement = document.getElementById('tax');
+    const cartTotalElement = document.getElementById('cartTotal');
+    const customerSearchBar = document.getElementById('cartCustomerSearch'); // Changed from customerSearchBar
+    const selectedCustomerDiv = document.getElementById('selectedCustomerInfo'); // Changed from selectedCustomer
+    const productSearchBar = document.getElementById('productSearch'); // Changed from productSearchBar
+    const productSuggestions = document.getElementById('productSuggestions');
+    const selectedProductDiv = document.getElementById('selectedProduct');
+    // const quantityInput = document.getElementById('quantity');
+    // const addToCartBtn = document.getElementById('addToCartBtn');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    // const retryReceiptBtn = document.getElementById('retryReceiptBtn');
+    const paymentMethodsContainer = document.getElementById('paymentMethods'); // Changed from paymentMethodsContainer
+    const addPaymentMethodBtn = document.getElementById('addPaymentMethodBtn');
+    const paymentTotalSpan = document.getElementById('totalPaid'); // Changed from paymentTotal
+    const cartTotalDisplay = document.getElementById('cartTotal'); // Changed from cartTotalDisplay
+    const productGrid = document.getElementById('productGrid');
+    const productSearch = document.getElementById('productSearch');
+    const productCategoryFilter = document.getElementById('productCategoryFilter');
+    const searchProductsBtn = document.getElementById('searchProductsBtn');
+    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+    const cartItemCountBadge = document.getElementById('cartItemCountBadge');
+    const cartItemCount = document.getElementById('cartItemCount');
+    const cartItemsTable = document.getElementById('cartItems');
+    const customerSearchResults = document.getElementById('customerSearchResults');
+    const selectedCustomerInfo = document.getElementById('selectedCustomerInfo');
+    const selectedCustomerName = document.getElementById('selectedCustomerName');
+    const selectedCustomerDetails = document.getElementById('selectedCustomerDetails');
+    const selectedCustomerPoints = document.getElementById('selectedCustomerPoints');
+    const removeCustomerBtn = document.getElementById('removeCustomerBtn');
+    const loyaltyPointsToUse = document.getElementById('loyaltyPointsToUse');
+  
+    const cartSubtotal = document.getElementById('cartSubtotal');
+    const cartDiscount = document.getElementById('cartDiscount');
+    const cartTax = document.getElementById('cartTax');
+    const cartTotal = document.getElementById('cartTotal');
+    const paymentMethods = document.getElementById('paymentMethods');
+    const totalPaid = document.getElementById('totalPaid');
+    const remainingBalance = document.getElementById('remainingBalance');
+    const productForm = document.getElementById('productForm');
+    const productModal = new bootstrap.Modal(document.getElementById('productModal'));
+    const productModalLabel = document.getElementById('productModalLabel');
+    const productIdInput = document.getElementById('productId');
+    const productNameInput = document.getElementById('productName');
+    const productCategoryInput = document.getElementById('productCategory');
+    const productPriceInput = document.getElementById('productPrice');
+    const productQuantityInput = document.getElementById('productQuantity');
+    const productBarcodeInput = document.getElementById('productBarcode');
+    const discountTable = document.getElementById('discountTable');
+    const discountForm = document.getElementById('discountForm');
+    const discountModal = new bootstrap.Modal(document.getElementById('discountModal'));
+    const discountModalLabel = document.getElementById('discountModalLabel');
+    const discountIdInput = document.getElementById('discountId');
+    const discountNameInput = document.getElementById('discountName');
+    const discountTypeInput = document.getElementById('discountType');
+    const discountValueInput = document.getElementById('discountValue');
+    const discountProductInput = document.getElementById('discountProduct');
+    const discountCategoryInput = document.getElementById('discountCategory');
+    const discountStartDateInput = document.getElementById('discountStartDate');
+    const discountEndDateInput = document.getElementById('discountEndDate');
+    const discountMinPurchaseInput = document.getElementById('discountMinPurchase');
+    const discountIsActiveInput = document.getElementById('discountIsActive');
+    const customerTable = document.getElementById('customerTable');
+    const customerModalLabel = document.getElementById('customerModalLabel');
+    const historyTable = document.getElementById('historyTable');
+    const customerCreateForm = document.getElementById('customerCreateForm');
+    const customerEditForm = document.getElementById('customerEditForm');
+    const customerModal = new bootstrap.Modal(document.getElementById('customerModal'));
+    const customerCreateModal = new bootstrap.Modal(document.getElementById('customerCreateModal'));
+    const customerEditModal = new bootstrap.Modal(document.getElementById('customerEditModal'));
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+
+
+
 
         function logError(message) {
             console.error(message);
@@ -741,25 +1217,34 @@ $csrf_token = getCsrfToken();
         }
 
         // Dashboard Functions
-        function fetchDashboardSummary() {
-            fetch('api.php?action=get_dashboard_summary')
-                .then(response => {
-                    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Dashboard Summary:', data);
-                    document.getElementById('totalSales').textContent = data.total_sales || 0;
-                    document.getElementById('totalRevenue').textContent = `$${parseFloat(data.total_revenue || 0).toFixed(2)}`;
-                    document.getElementById('totalProductsSold').textContent = data.total_products_sold || 0;
-                })
-                .catch(error => {
-                    logError('Error fetching dashboard summary: ' + error.message);
-                    console.error('Error fetching dashboard summary:', error);
-                });
-        }
+      function fetchDashboardSummary() {
+    fetch('api.php?action=get_dashboard_summary')
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Dashboard Summary:', data);
+            if (data.status === 'error') {
+                throw new Error(data.message || 'API returned an error');
+            }
+            document.getElementById('totalSales').textContent = data.total_sales || 0;
+            document.getElementById('totalRevenue').textContent = `$${parseFloat(data.total_revenue || 0).toFixed(2)}`;
+            document.getElementById('totalProductsSold').textContent = data.total_products_sold || 0;
+        })
+        .catch(error => {
+            logError('Error fetching dashboard summary: ' + error.message);
+            console.error('Error fetching dashboard summary:', error);
+            document.getElementById('totalSales').textContent = 'N/A';
+            document.getElementById('totalRevenue').textContent = 'N/A';
+            document.getElementById('totalProductsSold').textContent = 'N/A';
+            alert('Failed to load dashboard summary: ' + error.message);
+        });
+}
 
-        let salesTrendChart = null;
+        
+
+       
         function fetchDailySalesTrend() {
             fetch('api.php?action=get_daily_sales_trend')
                 .then(response => {
@@ -810,71 +1295,72 @@ $csrf_token = getCsrfToken();
         }
 
         function fetchLowStockProducts() {
-            fetch('api.php?action=get_low_stock_products')
-                .then(response => {
-                    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Low Stock Products:', data);
-                    const lowStockTable = document.getElementById('lowStockTable');
-                    lowStockTable.innerHTML = '';
-                    if (Array.isArray(data) && data.length > 0) {
-                        data.forEach(product => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${product.name}</td>
-                                <td>${product.category_name || 'N/A'}</td>
-                                <td>${product.quantity}</td>
-                                <td>$${parseFloat(product.price).toFixed(2)}</td>
-                                <td>${product.barcode}</td>
-                            `;
-                            lowStockTable.appendChild(row);
-                        });
-                    } else {
-                        lowStockTable.innerHTML = '<tr><td colspan="5" class="text-center">No low stock products found.</td></tr>';
-                    }
-                })
-                .catch(error => {
-                    logError('Error fetching low stock products: ' + error.message);
-                    console.error('Error fetching low stock products:', error);
-                });
-        }
-
-        document.getElementById('refreshLowStockBtn').addEventListener('click', fetchLowStockProducts);
-
-        // Sales Functions
-        let cart = [];
-        let clientId = null;
-        let selectedProduct = null;
-        const cartTable = document.getElementById('cartTable');
-        const subtotalElement = document.getElementById('subtotal');
-        const taxElement = document.getElementById('tax');
-        const cartTotalElement = document.getElementById('cartTotal');
-        const TAX_RATE = 0.05;
-        const clientSearchBar = document.getElementById('clientSearchBar');
-        const clientSuggestions = document.getElementById('clientSuggestions');
-        const selectedClientDiv = document.getElementById('selectedClient');
-        const productSearchBar = document.getElementById('productSearchBar');
-        const productSuggestions = document.getElementById('productSuggestions');
-        const selectedProductDiv = document.getElementById('selectedProduct');
-        const quantityInput = document.getElementById('quantity');
-        const addToCartBtn = document.getElementById('addToCartBtn');
-        const checkoutBtn = document.getElementById('checkoutBtn');
-        let csrfToken = document.getElementById('csrf_token').value;
-
-        function updateCartTable() {
-    fetch('api.php?action=get_active_discounts')
+    fetch('api.php?action=get_low_stock_products', {
+        headers: { 'X-CSRF-Token': csrfToken }
+    })
         .then(response => {
             if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             return response.json();
         })
-        .then(discounts => {
-            cartTable.innerHTML = '';
+        .then(data => {
+            console.log('Low Stock Products:', data);
+            const lowStockTable = document.getElementById('lowStockTable');
+            lowStockTable.innerHTML = '';
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach(product => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${product.name}</td>
+                        <td>${product.category_name || 'N/A'}</td>
+                        <td>${product.quantity}</td>
+                        <td>$${parseFloat(product.price).toFixed(2)}</td>
+                        <td>${product.barcode}</td>
+                    `;
+                    lowStockTable.appendChild(row);
+                });
+            } else {
+                lowStockTable.innerHTML = '<tr><td colspan="5" class="text-center">No low stock products found.</td></tr>';
+            }
+        })
+        .catch(error => {
+            logError('Error fetching low stock products: ' + error.message);
+            console.error('Error fetching low stock products:', error);
+            const lowStockTable = document.getElementById('lowStockTable');
+            lowStockTable.innerHTML = '<tr><td colspan="5" class="text-center">Failed to load low stock products: ' + error.message + '</td></tr>';
+            alert('Failed to load low stock products: ' + error.message);
+        });
+}
+
+
+function updateCartTable() {
+    fetch('api.php?action=get_active_discounts', {
+        headers: { 'X-CSRF-Token': csrfToken }
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.json();
+        })
+        .then(data => {
+            const discounts = Array.isArray(data) ? data : (data.discounts || []);
+            cartItemsTable.innerHTML = '';
             let subtotal = 0;
+            let discountTotal = 0;
+            const pointsToUse = parseInt(loyaltyPointsToUse.value) || 0;
+            const loyaltyDiscount = pointsToUse / 100;
+
+            if (cart.length === 0) {
+                cartItemsTable.innerHTML = '<tr><td colspan="4" class="text-center py-5">Your cart is empty</td></tr>';
+                cartSubtotal.textContent = '$0.00';
+                cartDiscount.textContent = '$0.00';
+                cartTax.textContent = '$0.00';
+                cartTotal.textContent = '$0.00';
+                checkoutBtn.disabled = true;
+                return;
+            }
+
             cart.forEach((item, index) => {
                 let discount = discounts.find(d => 
-                    d.product_id == item.id || 
+                    (d.product_id && d.product_id == item.id) || 
                     (d.category_id && !d.product_id && item.category_id == d.category_id) || 
                     (!d.product_id && !d.category_id)
                 );
@@ -889,331 +1375,198 @@ $csrf_token = getCsrfToken();
                     discountAmount = Math.min(discountAmount, item.price);
                     discountedPrice = item.price - discountAmount;
                 }
+
+                if (loyaltyDiscount > 0) {
+                    const totalItemValue = cart.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+                    const itemProportion = (item.quantity * item.price) / totalItemValue;
+                    const loyaltyDiscountPerItem = loyaltyDiscount * itemProportion;
+                    discountedPrice = Math.max(0, discountedPrice - loyaltyDiscountPerItem / item.quantity);
+                }
+
                 const itemTotal = item.quantity * discountedPrice;
                 subtotal += itemTotal;
+                discountTotal += discountAmount * item.quantity;
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${item.name} ${discount ? `<br><small class="text-success">${discount.name} (${discount.type === 'percentage' ? discount.value + '%' : '$' + discount.value})</small>` : ''}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="${item.image_url || 'images/placeholder.jpg'}" alt="${item.name}">
+                            <span class="cart-item-name ms-2">${item.name}</span>
+                        </div>
+                    </td>
                     <td>$${discountedPrice.toFixed(2)}</td>
                     <td>
-                        <button class="btn btn-sm btn-secondary" onclick="adjustQuantity(${index}, -1)">-</button>
-                        ${item.quantity}
-                        <button class="btn btn-sm btn-secondary" onclick="adjustQuantity(${index}, 1)">+</button>
+                        <div class="input-group input-group-sm quantity-control">
+                            <button class="btn btn-outline-secondary" type="button" onclick="updateCartItemQuantity(${index}, -1)">-</button>
+                            <input type="number" class="form-control text-center" value="${item.quantity}" min="1" onchange="updateCartItemQuantity(${index}, this.value)">
+                            <button class="btn btn-outline-secondary" type="button" onclick="updateCartItemQuantity(${index}, 1)">+</button>
+                        </div>
                     </td>
-                    <td>$${itemTotal.toFixed(2)}</td>
-                    <td><button class="btn btn-danger btn-sm" onclick="removeFromCart(${index})">Remove</button></td>
+                    <td>
+                        $${itemTotal.toFixed(2)}
+                        <i class="fas fa-trash remove-item-btn ms-2" onclick="removeCartItem(${index})"></i>
+                    </td>
                 `;
-                cartTable.appendChild(row);
+                cartItemsTable.appendChild(row);
             });
+
             const tax = subtotal * TAX_RATE;
             const total = subtotal + tax;
-            subtotalElement.textContent = subtotal.toFixed(2);
-            taxElement.textContent = tax.toFixed(2);
-            cartTotalElement.textContent = total.toFixed(2);
+
+            cartSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+            cartDiscount.textContent = `$${discountTotal.toFixed(2)}`;
+            cartTax.textContent = `$${tax.toFixed(2)}`;
+            cartTotal.textContent = `$${total.toFixed(2)}`;
+            checkoutBtn.disabled = cart.length === 0 || !customerId;
+            updatePaymentTotal();
         })
         .catch(error => {
             logError('Error fetching discounts for cart: ' + error.message);
-            console.error('Error fetching discounts for cart:', error);
-            // Fallback to original pricing
-            cartTable.innerHTML = '';
-            let subtotal = 0;
-            cart.forEach((item, index) => {
-                const itemTotal = item.quantity * item.price;
-                subtotal += itemTotal;
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.name}</td>
-                    <td>$${item.price.toFixed(2)}</td>
-                    <td>
-                        <button class="btn btn-sm btn-secondary" onclick="adjustQuantity(${index}, -1)">-</button>
-                        ${item.quantity}
-                        <button class="btn btn-sm btn-secondary" onclick="adjustQuantity(${index}, 1)">+</button>
-                    </td>
-                    <td>$${itemTotal.toFixed(2)}</td>
-                    <td><button class="btn btn-danger btn-sm" onclick="removeFromCart(${index})">Remove</button></td>
-                `;
-                cartTable.appendChild(row);
-            });
-            const tax = subtotal * TAX_RATE;
-            const total = subtotal + tax;
-            subtotalElement.textContent = subtotal.toFixed(2);
-            taxElement.textContent = tax.toFixed(2);
-            cartTotalElement.textContent = total.toFixed(2);
+            alert('Error updating cart: ' + error.message);
         });
 }
 
-        function adjustQuantity(index, change) {
-            const item = cart[index];
-            const newQuantity = item.quantity + change;
-            const maxQuantity = item.maxQuantity;
-            if (newQuantity < 1) {
-                removeFromCart(index);
-                return;
+
+
+function updateCartQuantity(index, change) {
+        const newQuantity = cart[index].quantity + parseInt(change);
+        if (newQuantity < 1) {
+            removeCartItem(index);
+            return;
+        }
+        cart[index].quantity = newQuantity;
+        updateCartTable();
+    }
+
+    function removeCartItem(index) {
+        cart.splice(index, 1);
+        updateCartTable();
+    }
+
+
+// Preload placeholder image (data URI for a 1x1 transparent pixel)
+const placeholderImage = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
+
+// Fetch products for the Product Catalog
+async function fetchProducts(page = 1, perPage = 10, search = '', categoryId = null) {
+    if (window.isFetchingProducts) {
+        console.log('FetchProducts already in progress, skipping...');
+        return;
+    }
+    window.isFetchingProducts = true;
+    try {
+        const url = 'api.php';
+        const params = new URLSearchParams({
+            action: 'get_product_catalog',
+            page: page,
+            per_page: perPage
+        });
+        if (search) params.append('search', search);
+        if (categoryId) params.append('category_id', categoryId);
+
+        console.log(`Fetching products: ${url}?${params.toString()}`);
+        const response = await fetch(`${url}?${params.toString()}`, {
+            method: 'GET',
+            headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || ''
             }
-            if (newQuantity > maxQuantity) {
-                alert(`Only ${maxQuantity} units of ${item.name} are available.`);
-                return;
-            }
-            item.quantity = newQuantity;
-            updateCartTable();
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`HTTP ${response.status}: ${errorText}`);
+            logError(`HTTP ${response.status}: ${errorText}`);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartTable();
+        const data = await response.json();
+        console.log('Raw response:', JSON.stringify(data));
+
+        if (!data.products || !Array.isArray(data.products)) {
+            console.error('Invalid response format:', data);
+            logError('Invalid response format');
+            throw new Error('Invalid response format');
         }
 
-        let clientTimeout;
-        clientSearchBar.addEventListener('input', () => {
-            clearTimeout(clientTimeout);
-            const query = clientSearchBar.value.trim();
-            if (query.length < 2) {
-                clientSuggestions.innerHTML = '';
-                clientSuggestions.style.display = 'none';
-                return;
-            }
-            clientTimeout = setTimeout(() => {
-                fetch(`api.php?action=search_clients&username=${encodeURIComponent(query)}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Client Search:', data);
-                        clientSuggestions.innerHTML = '';
-                        const clients = Array.isArray(data) ? data : (data.clients || []);
-                        if (clients.length > 0) {
-                            clients.forEach(client => {
-                                const div = document.createElement('div');
-                                div.className = 'autocomplete-item';
-                                div.textContent = client.username;
-                                div.addEventListener('click', () => {
-                                    clientId = client.id;
-                                    clientSearchBar.value = client.username;
-                                    selectedClientDiv.textContent = `Selected Client: ${client.username}`;
-                                    clientSuggestions.innerHTML = '';
-                                    clientSuggestions.style.display = 'none';
-                                });
-                                clientSuggestions.appendChild(div);
-                            });
-                            clientSuggestions.style.display = 'block';
-                        } else {
-                            clientSuggestions.style.display = 'none';
-                        }
-                    })
-                    .catch(error => {
-                        logError('Error searching clients: ' + error.message);
-                        console.error('Error searching clients:', error);
-                        clientSuggestions.style.display = 'none';
-                    });
-            }, 300);
+        // Update product catalog UI
+        const productContainer = document.getElementById('productGrid');
+        if (!productContainer) {
+            console.error('Product container not found');
+            logError('Product container not found');
+            return;
+        }
+
+        productContainer.innerHTML = ''; // Clear existing products
+        if (data.products.length === 0) {
+            productContainer.innerHTML = '<div class="col-12 text-center py-5">No products found.</div>';
+            return;
+        }
+
+        data.products.forEach(product => {
+            console.log(`Rendering product: ${product.name}, Image: ${product.products_image || 'placeholder'}`);
+            const productElement = document.createElement('div');
+            productElement.className = 'col-md-3 mb-4';
+            productElement.innerHTML = `
+                <div class="card product-card">
+                    <div class="product-img-container">
+                        <img src="${product.products_image ? `/POS/images/${product.products_image}` : placeholderImage}" class="product-img" alt="${product.name}" onerror="this.onerror=null; console.warn('Image failed to load: ${product.products_image || 'placeholder'}'); this.src='${placeholderImage}'">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">${product.name}</h5>
+                        <p class="card-text">Price: $${parseFloat(product.price || 0).toFixed(2)}</p>
+                        <p class="product-stock ${product.quantity > 0 ? 'in-stock' : 'out-of-stock'}">
+                            Quantity: ${product.quantity || 0}
+                        </p>
+                        <p class="card-text">Category: ${product.category_name || 'None'}</p>
+                        <p class="card-text">Barcode: ${product.barcode || 'N/A'}</p>
+                        <div class="input-group">
+                            <input type="number" class="form-control" value="1" min="1" max="${product.quantity || 1}" id="qty-${product.id}">
+                            <button class="btn btn-primary add-to-cart-btn" onclick="addToCart(${product.id}, parseInt(document.getElementById('qty-${product.id}').value))">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            productContainer.appendChild(productElement);
         });
 
-        let productTimeout;
-        productSearchBar.addEventListener('input', () => {
-            clearTimeout(productTimeout);
-            const query = productSearchBar.value.trim();
-            if (query.length < 2) {
-                productSuggestions.innerHTML = '';
-                productSuggestions.style.display = 'none';
-                selectedProductDiv.innerHTML = '';
-                selectedProduct = null;
-                return;
+        // Update pagination
+        const paginationContainer = document.getElementById('pagination-controls');
+        if (paginationContainer) {
+            paginationContainer.innerHTML = '';
+            for (let i = 1; i <= (data.total_pages || 1); i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.className = `btn btn-sm ${i === page ? 'btn-primary' : 'btn-outline-primary'} mx-1`;
+                pageButton.disabled = i === page;
+                pageButton.onclick = () => fetchProducts(i, perPage, search, categoryId);
+                paginationContainer.appendChild(pageButton);
             }
-            productTimeout = setTimeout(() => {
-                fetch(`api.php?action=search_products&query=${encodeURIComponent(query)}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Product Search:', data);
-                        productSuggestions.innerHTML = '';
-                        const products = Array.isArray(data) ? data : (data.products || []);
-                        if (products.length > 0) {
-                            products.forEach(product => {
-                                const div = document.createElement('div');
-                                div.className = 'autocomplete-item';
-                                div.textContent = `${product.name} (Barcode: ${product.barcode}) - $${product.price} (Qty: ${product.quantity})`;
-                                div.addEventListener('click', () => {
-                                    selectedProduct = {
-                                        id: product.id,
-                                        name: product.name,
-                                        price: parseFloat(product.price),
-                                        maxQuantity: parseInt(product.quantity)
-                                    };
-                                    productSearchBar.value = product.name;
-                                    selectedProductDiv.textContent = `Selected Product: ${product.name} - $${product.price} (Available: ${product.quantity})`;
-                                    productSuggestions.innerHTML = '';
-                                    productSuggestions.style.display = 'none';
-                                    quantityInput.focus();
-                                });
-                                productSuggestions.appendChild(div);
-                            });
-                            productSuggestions.style.display = 'block';
-                        } else {
-                            productSuggestions.style.display = 'none';
-                            selectedProductDiv.textContent = 'No products found.';
-                            selectedProduct = null;
-                        }
-                    })
-                    .catch(error => {
-                        logError('Error searching products: ' + error.message);
-                        console.error('Error searching products:', error);
-                        productSuggestions.style.display = 'none';
-                    });
-            }, 300);
-        });
+        }
 
-        document.addEventListener('click', (e) => {
-            if (!clientSearchBar.contains(e.target) && !clientSuggestions.contains(e.target)) {
-                clientSuggestions.style.display = 'none';
-            }
-            if (!productSearchBar.contains(e.target) && !productSuggestions.contains(e.target)) {
-                productSuggestions.style.display = 'none';
-            }
-        });
+        console.log(`Fetched ${data.products.length} products`);
+    } catch (error) {
+        console.error('Fetch Error:', error);
+        logError(`Fetch Error: ${error.message}`);
+        const productContainer = document.getElementById('productGrid');
+        if (productContainer) {
+            productContainer.innerHTML = '<div class="col-12 text-center py-5">Failed to load products: ' + error.message + '</div>';
+        }
+    } finally {
+        window.isFetchingProducts = false;
+        console.log('FetchProducts completed.');
+    }
+}
 
-        addToCartBtn.addEventListener('click', () => {
-            if (!selectedProduct) {
-                alert('Please select a product.');
-                return;
-            }
-            const quantity = parseInt(quantityInput.value);
-            if (quantity <= 0) {
-                alert('Please enter a valid quantity.');
-                return;
-            }
-            const maxQuantity = selectedProduct.maxQuantity;
-            if (quantity > maxQuantity) {
-                alert(`Only ${maxQuantity} units of ${selectedProduct.name} are available.`);
-                return;
-            }
-            const existingItem = cart.find(item => item.id === selectedProduct.id);
-            if (existingItem) {
-                const newQuantity = existingItem.quantity + quantity;
-                if (newQuantity > maxQuantity) {
-                    alert(`Cannot add ${newQuantity} units. Only ${maxQuantity} units are available.`);
-                    return;
-                }
-                existingItem.quantity = newQuantity;
-            } else {
-                cart.push({
-                    id: selectedProduct.id,
-                    name: selectedProduct.name,
-                    price: selectedProduct.price,
-                    quantity: quantity,
-                    maxQuantity: maxQuantity
-                });
-            }
-            updateCartTable();
-            quantityInput.value = 1;
-            productSearchBar.value = '';
-            selectedProductDiv.textContent = '';
-            selectedProduct = null;
-        });
+// Initial call to fetch products
+document.addEventListener('DOMContentLoaded', () => {
+    fetchProducts();
+});
 
-        checkoutBtn.addEventListener('click', () => {
-            if (!clientId) {
-                alert('Please select a client.');
-                return;
-            }
-            if (cart.length === 0) {
-                alert('Cart is empty. Please add products to proceed.');
-                return;
-            }
-            const payload = {
-                action: 'checkout',
-                client_id: clientId,
-                items: cart.map(item => ({ id: item.id, quantity: item.quantity })),
-                csrf_token: csrfToken
-            };
-            fetch('api.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-                .then(response => {
-                    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        alert('Sale processed successfully! Sale ID: ' + data.sale_id);
-                        const receiptPayload = {
-                            action: 'generate_receipt',
-                            sale_id: data.sale_id,
-                            csrf_token: csrfToken
-                        };
-                        fetch('api.php', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(receiptPayload)
-                        })
-                            .then(response => {
-                                const contentType = response.headers.get('Content-Type');
-                                if (!response.ok) {
-                                    if (contentType.includes('application/json')) {
-                                        return response.json().then(err => {
-                                            console.error('Receipt Generation Error (JSON Response):', err);
-                                            throw new Error(err.message || 'Failed to generate receipt');
-                                        });
-                                    } else {
-                                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                                    }
-                                }
-                                if (!contentType.includes('application/pdf')) {
-                                    return response.text().then(text => {
-                                        console.error('Unexpected response:', text);
-                                        throw new Error('Expected PDF but received: ' + contentType);
-                                    });
-                                }
-                                return response.blob();
-                            })
-                            .then(blob => {
-                                const url = window.URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = `Receipt_${data.sale_id}.pdf`;
-                                a.click();
-                                window.URL.revokeObjectURL(url);
-                            })
-                            .catch(error => {
-                                logError('Error generating receipt: ' + error.message);
-                                console.error('Error generating receipt:', error);
-                                alert('Sale processed, but error generating receipt: ' + error.message);
-                            })
-                            .finally(() => {
-                                fetchDashboardSummary();
-                                fetchDailySalesTrend();
-                                fetchLowStockProducts();
-                                cart = [];
-                                updateCartTable();
-                                clientSearchBar.value = '';
-                                selectedClientDiv.textContent = '';
-                                clientId = null;
-                            });
-                    } else {
-                        alert('Error processing sale: ' + (data.message || 'Unknown error'));
-                    }
-                })
-                .catch(error => {
-                    logError('Error during checkout: ' + error.message);
-                    console.error('Error during checkout:', error);
-                    alert('Error during checkout: ' + error.message);
-                });
-        });
 
-        // Sales Report Functions
-        const salesStartDateInput = document.getElementById('salesStartDate');
-        const salesEndDateInput = document.getElementById('salesEndDate');
-        const salesSearchQueryInput = document.getElementById('salesSearchQuery');
-        const fetchSalesReportBtn = document.getElementById('fetchSalesReportBtn');
-        const exportSalesCsvBtn = document.getElementById('exportSalesCsvBtn');
-        const exportSalesPdfBtn = document.getElementById('exportSalesPdfBtn');
-        const salesReportTable = document.getElementById('salesReportTable');
-
-        function fetchSalesReport() {
+    function fetchSalesReport() {
     const startDate = salesStartDateInput.value;
     const endDate = salesEndDateInput.value;
     const searchQuery = salesSearchQueryInput.value.trim();
@@ -1260,70 +1613,10 @@ $csrf_token = getCsrfToken();
         });
 }
 
-        function exportSalesCsv() {
-            const startDate = salesStartDateInput.value;
-            const endDate = salesEndDateInput.value;
-            if (!startDate || !endDate) {
-                alert('Please select both start and end dates.');
-                return;
-            }
-            let url = `api.php?action=export_sales_report_csv&start_date=${startDate}&end_date=${endDate}`;
-            const searchQuery = salesSearchQueryInput.value.trim();
-            if (searchQuery) url += `&search_query=${encodeURIComponent(searchQuery)}`;
-            window.location.href = url;
-        }
 
-        function exportSalesPdf() {
-            const startDate = salesStartDateInput.value;
-            const endDate = salesEndDateInput.value;
-            const searchQuery = salesSearchQueryInput.value.trim();
-            if (!startDate || !endDate) {
-                alert('Please select both start and end dates.');
-                return;
-            }
-            const payload = {
-                action: 'generate_sales_report_pdf',
-                start_date: startDate,
-                end_date: endDate,
-                search_query: searchQuery || '',
-                csrf_token: csrfToken
-            };
-            fetch('api.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-                .then(response => {
-                    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    return response.blob();
-                })
-                .then(blob => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `SalesReport_${startDate}_to_${endDate}.pdf`;
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                })
-                .catch(error => {
-                    logError('Error generating PDF: ' + error.message);
-                    console.error('Error generating PDF:', error);
-                    alert('Error generating PDF: ' + error.message);
-                });
-        }
 
-        fetchSalesReportBtn.addEventListener('click', fetchSalesReport);
-        exportSalesCsvBtn.addEventListener('click', exportSalesCsv);
-        exportSalesPdfBtn.addEventListener('click', exportSalesPdf);
 
-        // Most Sold Products Functions
-        const mostSoldStartDateInput = document.getElementById('mostSoldStartDate');
-        const mostSoldEndDateInput = document.getElementById('mostSoldEndDate');
-        const fetchMostSoldBtn = document.getElementById('fetchMostSoldBtn');
-        const exportMostSoldCsvBtn = document.getElementById('exportMostSoldCsvBtn');
-        const mostSoldTable = document.getElementById('mostSoldTable');
-
-        function fetchMostSoldProducts() {
+ function fetchMostSoldProducts() {
             const startDate = mostSoldStartDateInput.value;
             const endDate = mostSoldEndDateInput.value;
             if (!startDate || !endDate) {
@@ -1363,228 +1656,341 @@ $csrf_token = getCsrfToken();
                 });
         }
 
-        function exportMostSoldCsv() {
-            const startDate = mostSoldStartDateInput.value;
-            const endDate = mostSoldEndDateInput.value;
-            if (!startDate || !endDate) {
-                alert('Please select both start and end dates.');
-                return;
-            }
-            window.location.href = `api.php?action=export_most_sold_products_csv&start_date=${startDate}&end_date=${endDate}`;
-        }
 
-        fetchMostSoldBtn.addEventListener('click', fetchMostSoldProducts);
-        exportMostSoldCsvBtn.addEventListener('click', exportMostSoldCsv);
-
-        // Inventory Functions
-        const inventoryTable = document.getElementById('inventoryTable');
-        const productForm = document.getElementById('productForm');
-        const productModal = new bootstrap.Modal(document.getElementById('productModal'));
-        const productModalLabel = document.getElementById('productModalLabel');
-        const productIdInput = document.getElementById('productId');
-        const productNameInput = document.getElementById('productName');
-        const productCategoryInput = document.getElementById('productCategory');
-        const productPriceInput = document.getElementById('productPrice');
-        const productQuantityInput = document.getElementById('productQuantity');
-        const productBarcodeInput = document.getElementById('productBarcode');
-        const suggestionList = document.getElementById('suggestionList');
-
-adjustmentSearch.addEventListener('input', async () => {
-    const term = adjustmentSearch.value;
-    suggestionList.style.display = term.length >= 2 ? 'block' : 'none';
-    if (term.length < 2) {
-        suggestionList.innerHTML = '';
+        function searchCustomers() {
+    const query = cartCustomerSearch.value.trim();
+    if (query.length < 2) {
+        customerSearchResults.style.display = 'none';
         return;
     }
-    try {
-        const response = await fetch(`api.php?action=get_product_suggestions&term=${encodeURIComponent(term)}`);
-        if (!response.ok) throw new Error('Network error');
-        const products = await response.json();
-        suggestionList.innerHTML = products.map(p => `<li class="list-group-item suggestion-item">${p}</li>`).join('');
-        document.querySelectorAll('.suggestion-item').forEach(item => {
-            item.addEventListener('click', () => {
-                adjustmentSearch.value = item.textContent;
-                suggestionList.style.display = 'none';
-                fetchStockAdjustments();
-            });
-        });
-    } catch (error) {
-        console.error('Autocomplete error:', error);
-    }
-});
-
-// Hide suggestions when clicking outside
-document.addEventListener('click', (e) => {
-    if (!adjustmentSearch.contains(e.target) && !suggestionList.contains(e.target)) {
-        suggestionList.style.display = 'none';
-    }
-});
-
-
-async function fetchForecast() {
-    try {
-        const startDate = document.getElementById('forecastStartDate').value;
-        const endDate = document.getElementById('forecastEndDate').value;
-        const days = document.getElementById('forecastDays').value;
-        
-        if (!startDate || !endDate || !days) {
-            throw new Error('Please fill all required fields');
-        }
-
-        // Show loading state
-        const forecastBtn = document.getElementById('fetchForecastBtn');
-        forecastBtn.disabled = true;
-        forecastBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
-
-        const response = await fetch(`api.php?action=get_sales_forecast&start_date=${startDate}&end_date=${endDate}&days=${days}`);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        if (data.status !== 'success' || !data.forecasts || data.forecasts.length === 0) {
-            throw new Error(data.message || 'No forecast data available');
-        }
-
-        // Prepare chart data
-        const labels = data.forecasts.map(f => f.product_name);
-        const historicalData = data.forecasts.map(f => f.historical_sales);
-        const predictedData = data.forecasts.map(f => f.predicted_sales);
-
-        // Get chart canvas
-        const canvas = document.getElementById('forecastChart');
-        if (!canvas) {
-            throw new Error('Chart canvas not found');
-        }
-        
-        const ctx = canvas.getContext('2d');
-
-        // Destroy existing chart if it exists
-        if (window.forecastChartInstance) {
-            window.forecastChartInstance.destroy();
-        }
-
-        // Create new chart
-        window.forecastChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Historical Sales (Last Period)',
-                        data: historicalData,
-                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Predicted Sales (Next Period)',
-                        data: predictedData,
-                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Quantity Sold'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Products'
-                        }
-                    }
-                },
-                plugins: {
-                    title: {
-                        display: true,
-                        text: `Sales Forecast - Historical vs Predicted (${startDate} to ${endDate})`
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.dataset.label}: ${context.raw}`;
-                            }
-                        }
-                    }
-                }
+    fetch(`api.php?action=get_all_customers&search=${encodeURIComponent(query)}`, {
+        headers: { 'X-CSRF-Token': csrfToken }
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.json();
+        })
+        .then(data => {
+            customerSearchResults.innerHTML = '';
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach(customer => {
+                    const item = document.createElement('div');
+                    item.className = 'list-group-item list-group-item-action';
+                    item.textContent = `${customer.username} (${customer.email})`;
+                    item.addEventListener('click', () => {
+                        customerId = customer.id;
+                        selectedCustomerName.textContent = customer.username;
+                        selectedCustomerDetails.textContent = `${customer.email} | ${customer.phone || 'N/A'} | ${customer.address || 'N/A'}`;
+                        selectedCustomerPoints.textContent = `${customer.loyalty_points || 0} points`;
+                        selectedCustomerInfo.style.display = 'block';
+                        customerSearchResults.style.display = 'none';
+                        cartCustomerSearch.value = '';
+                        checkoutBtn.disabled = cart.length === 0;
+                    });
+                    customerSearchResults.appendChild(item);
+                });
+                customerSearchResults.style.display = 'block';
+            } else {
+                customerSearchResults.style.display = 'none';
             }
+        })
+        .catch(error => {
+            logError('Error searching customers: ' + error.message);
+            alert('Error searching customers: ' + error.message);
         });
+}
 
-    } catch (error) {
-        console.error('Forecast error:', error);
-        alert('Error generating forecast: ' + error.message);
-    } finally {
-        // Reset button state
-        const forecastBtn = document.getElementById('fetchForecastBtn');
-        if (forecastBtn) {
-            forecastBtn.disabled = false;
-            forecastBtn.textContent = 'Generate Forecast';
-        }
-    }
+  function fetchInventory() {
+    fetch('api.php?action=get_inventory')
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Inventory Data:', data);
+            inventoryTable.innerHTML = '';
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach(product => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.category_name || 'N/A'}</td>
+                        <td>$${parseFloat(product.price).toFixed(2)}</td>
+                        <td>${product.quantity}</td>
+                        <td>${product.barcode}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-2" onclick="editProduct(${product.id}, '${product.name}', ${product.category_id}, ${product.price}, ${product.quantity}, '${product.barcode}', '${product.image_url || ''}', '${product.description || ''}')">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})">Delete</button>
+                        </td>
+                    `;
+                    inventoryTable.appendChild(row);
+                });
+            } else {
+                inventoryTable.innerHTML = '<tr><td colspan="7" class="text-center">No products found.</td></tr>';
+            }
+        })
+        .catch(error => {
+            logError('Error fetching inventory: ' + error.message);
+            console.error('Error fetching inventory:', error);
+            alert('Error fetching inventory: ' + error.message);
+        });
 }
 
 
 
-        function fetchInventory() {
-            fetch('api.php?action=get_inventory')
-                .then(response => {
-                    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Inventory Data:', data);
-                    inventoryTable.innerHTML = '';
-                    if (Array.isArray(data) && data.length > 0) {
-                        data.forEach(product => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${product.id}</td>
-                                <td>${product.name}</td>
-                                <td>${product.category_name || 'N/A'}</td>
-                                <td>$${parseFloat(product.price).toFixed(2)}</td>
-                                <td>${product.quantity}</td>
-                                <td>${product.barcode}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning me-2" onclick="editProduct(${product.id}, '${product.name}', ${product.category_id}, ${product.price}, ${product.quantity}, '${product.barcode}')">Edit</button>
-                                    <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})">Delete</button>
-                                </td>
-                            `;
-                            inventoryTable.appendChild(row);
-                        });
-                    } else {
-                        inventoryTable.innerHTML = '<tr><td colspan="7" class="text-center">No products found.</td></tr>';
-                    }
-                })
-                .catch(error => {
-                    logError('Error fetching inventory: ' + error.message);
-                    console.error('Error fetching inventory:', error);
-                    alert('Error fetching inventory: ' + error.message);
+function addToCart(id, name, price, quantity, image_url, category_id) {
+        const qtyInput = document.getElementById(`quantity-${id}`);
+        const qty = parseInt(qtyInput.value) || 1;
+        if (qty > quantity) {
+            alert('Cannot add more than available stock.');
+            return;
+        }
+        const existingItem = cart.find(item => item.id === id);
+        if (existingItem) {
+            existingItem.quantity += qty;
+        } else {
+            cart.push({ id, name, price, quantity: qty, image_url, category_id });
+        }
+        updateCartTable();
+    }
+
+
+    function fetchStockAdjustments() {
+    const search = document.getElementById('adjustmentSearch').value;
+    const start_date = document.getElementById('adjustmentStartDate').value;
+    const end_date = document.getElementById('adjustmentEndDate').value;
+    let url = 'api.php?action=get_stock_adjustments';
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+    if (start_date) url += `&start_date=${encodeURIComponent(start_date)}`;
+    if (end_date) url += `&end_date=${encodeURIComponent(end_date)}`;
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.json();
+        })
+        .then(data => {
+            const adjustmentTable = document.getElementById('adjustmentTable');
+            adjustmentTable.innerHTML = '';
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach(adjustment => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${adjustment.id}</td>
+                        <td>${adjustment.product_name || 'N/A'}</td>
+                        <td>${adjustment.current_quantity !== null ? adjustment.current_quantity : 'N/A'}</td>
+                        <td>${adjustment.quantity > 0 ? '+' : ''}${adjustment.quantity}</td>
+                        <td>${adjustment.reason}</td>
+                        <td>${adjustment.user_name || 'N/A'}</td>
+                        <td>${adjustment.adjusted_at}</td>
+                    `;
+                    adjustmentTable.appendChild(row);
                 });
-        }
+            } else {
+                adjustmentTable.innerHTML = '<tr><td colspan="7" class="text-center">No adjustments found.</td></tr>';
+            }
+        })
+        .catch(error => {
+            logError('Error fetching adjustments: ' + error.message);
+            alert('Error fetching adjustments: ' + error.message);
+        });
+}
 
-        function editProduct(id, name, categoryId, price, quantity, barcode) {
-            productModalLabel.textContent = 'Edit Product';
-            productIdInput.value = id;
-            productNameInput.value = name;
-            productCategoryInput.value = categoryId;
-            productPriceInput.value = price;
-            productQuantityInput.value = quantity;
-            productBarcodeInput.value = barcode;
-            productModal.show();
-        }
 
-        function deleteProduct(id) {
+
+
+function fetchCustomers(search = '') {
+    const url = search ? `api.php?action=get_all_customers&search=${encodeURIComponent(search)}` : 'api.php?action=get_all_customers';
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.json();
+        })
+        .then(data => {
+            customerTableBody.innerHTML = '';
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach(customer => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${customer.id}</td>
+                        <td>${customer.username}</td>
+                        <td>${customer.email}</td>
+                        <td>${customer.first_name || ''} ${customer.last_name || ''}</td>
+                        <td>${customer.phone || 'N/A'}</td>
+                        <td>${customer.address || 'N/A'}</td>
+                        <td>${customer.loyalty_points || 0}</td>
+                        <td>${customer.created_at}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info me-1" onclick="viewCustomerHistory(${customer.id}, '${customer.username}')">History</button>
+                            <button class="btn btn-sm btn-warning me-1" onclick="editCustomer(${customer.id}, '${customer.username}', '${customer.email}', '${customer.first_name || ''}', '${customer.last_name || ''}', '${customer.phone || ''}', '${customer.address || ''}', ${customer.loyalty_points || 0})">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCustomer(${customer.id})">Delete</button>
+                        </td>
+                    `;
+                    customerTableBody.appendChild(row);
+                });
+            } else {
+                customerTableBody.innerHTML = '<tr><td colspan="8" class="text-center">No customers found.</td></tr>';
+            }
+        })
+        .catch(error => {
+            logError('Error fetching customers: ' + error.message);
+            alert('Error fetching customers: ' + error.message);
+        });
+}
+
+
+function checkout() {
+        if (cart.length === 0) {
+            alert('Cart is empty.');
+            return;
+        }
+        const paymentInputs = paymentMethods.querySelectorAll('.payment-amount');
+        const paymentTypes = paymentMethods.querySelectorAll('.payment-type');
+        let paymentTotal = 0;
+        const paymentMethodsData = [];
+        paymentInputs.forEach((input, index) => {
+            const amount = parseFloat(input.value) || 0;
+            if (amount > 0) {
+                paymentMethodsData.push({
+                    type: paymentTypes[index].value,
+                    amount: amount
+                });
+                paymentTotal += amount;
+            }
+        });
+        const cartTotalValue = parseFloat(cartTotal.textContent.replace('$', '')) || 0;
+        if (paymentTotal < cartTotalValue) {
+            alert(`Total payment ($${paymentTotal.toFixed(2)}) is less than cart total ($${cartTotalValue.toFixed(2)}).`);
+            return;
+        }
+        if (paymentTotal > cartTotalValue) {
+            alert(`Total payment ($${paymentTotal.toFixed(2)}) exceeds cart total ($${cartTotalValue.toFixed(2)}).`);
+            return;
+        }
+        const pointsToRedeem = parseInt(loyaltyPointsToUse.value) || 0;
+        const subtotal = parseFloat(cartSubtotal.textContent.replace('$', '')) || 0;
+        const pointsEarned = Math.floor(subtotal * POINTS_PER_DOLLAR);
+        const payload = {
+            action: 'checkout',
+            customer_id: customerId,
+            items: cart.map(item => ({ id: item.id, quantity: item.quantity })),
+            points_earned: pointsEarned,
+            points_redeemed: pointsToRedeem,
+            payment_methods: paymentMethodsData,
+            csrf_token: csrfToken
+        };
+        fetch('api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+            body: JSON.stringify(payload)
+        })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Sale processed successfully! Sale ID: ' + data.sale_id);
+                    cart = [];
+                    updateCartTable();
+                    customerSearchBar.value = '';
+                    selectedCustomerInfo.style.display = 'none';
+                    customerId = null;
+                    loyaltyPointsToUse.value = 0;
+                    paymentMethods.innerHTML = `
+                        <div class="payment-method mb-3">
+                            <div class="row g-2">
+                                <div class="col-md-5">
+                                    <select class="form-control payment-type">
+                                        <option value="cash">Cash</option>
+                                        <option value="credit_card">Credit Card</option>
+                                        <option value="debit_card">Debit Card</option>
+                                        <option value="loyalty_points">Loyalty Points</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="number" class="form-control payment-amount" placeholder="Amount" min="0" step="0.01">
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-danger w-100 remove-payment" disabled>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    totalPaid.textContent = '$0.00';
+                    fetchDashboardSummary();
+                    fetchDailySalesTrend();
+                    fetchLowStockProducts();
+                } else {
+                    alert('Error processing sale: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                logError('Error during checkout: ' + error.message);
+                alert('Error during checkout: ' + error.message);
+            });
+    }
+
+
+
+
+
+function exportSalesCsv() {
+        const startDate = salesStartDateInput.value;
+        const endDate = salesEndDateInput.value;
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates.');
+            return;
+        }
+        let url = `api.php?action=export_sales_report_csv&start_date=${startDate}&end_date=${endDate}`;
+        const searchQuery = salesSearchQueryInput.value.trim();
+        if (searchQuery) url += `&search_query=${encodeURIComponent(searchQuery)}`;
+        window.location.href = url;
+    }
+
+    function exportSalesPdf() {
+        const startDate = salesStartDateInput.value;
+        const endDate = salesEndDateInput.value;
+        const searchQuery = salesSearchQueryInput.value.trim();
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates.');
+            return;
+        }
+        const payload = {
+            action: 'generate_sales_report_pdf',
+            start_date: startDate,
+            end_date: endDate,
+            search_query: searchQuery || '',
+            csrf_token: csrfToken
+        };
+        fetch('api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `SalesReport_${startDate}_to_${endDate}.pdf`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                logError('Error generating PDF: ' + error.message);
+                alert('Error generating PDF: ' + error.message);
+            });
+    }
+    
+
+
+         function deleteProduct(id) {
             if (!confirm('Are you sure you want to delete this product?')) return;
             const payload = {
                 action: 'delete_product',
@@ -1615,187 +2021,8 @@ async function fetchForecast() {
                 });
         }
 
-        productForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const id = productIdInput.value;
-            const action = id ? 'update_product' : 'add_product';
-            const payload = {
-                action: action,
-                id: id || undefined,
-                name: productNameInput.value,
-                category_id: productCategoryInput.value,
-                price: parseFloat(productPriceInput.value),
-                quantity: parseInt(productQuantityInput.value),
-                barcode: productBarcodeInput.value,
-                csrf_token: csrfToken
-            };
-            fetch('api.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-                .then(response => {
-                    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        alert(id ? 'Product updated successfully.' : 'Product added successfully.');
-                        productModal.hide();
-                        productForm.reset();
-                        productIdInput.value = '';
-                        productModalLabel.textContent = 'Add Product';
-                        fetchInventory();
-                        fetchLowStockProducts(); // Refresh low stock alerts
-                    } else {
-                        alert('Error saving product: ' + (data.message || 'Unknown error'));
-                    }
-                })
-                .catch(error => {
-                    logError('Error saving product: ' + error.message);
-                    console.error('Error saving product:', error);
-                    alert('Error saving product: ' + error.message);
-                });
-        });
 
-        document.getElementById('addProductBtn').addEventListener('click', () => {
-            productModalLabel.textContent = 'Add Product';
-            productForm.reset();
-            productIdInput.value = '';
-        });
-
-        // Discount Functions
-const discountTable = document.getElementById('discountTable');
-const discountForm = document.getElementById('discountForm');
-const discountModal = new bootstrap.Modal(document.getElementById('discountModal'));
-const discountModalLabel = document.getElementById('discountModalLabel');
-const discountIdInput = document.getElementById('discountId');
-const discountNameInput = document.getElementById('discountName');
-const discountTypeInput = document.getElementById('discountType');
-const discountValueInput = document.getElementById('discountValue');
-const discountProductInput = document.getElementById('discountProduct');
-const discountCategoryInput = document.getElementById('discountCategory');
-const discountStartDateInput = document.getElementById('discountStartDate');
-const discountEndDateInput = document.getElementById('discountEndDate');
-const discountMinPurchaseInput = document.getElementById('discountMinPurchase');
-const discountIsActiveInput = document.getElementById('discountIsActive');
-const customerTable = document.getElementById('customerTable');
-const customerSearch = document.getElementById('customerSearch');
-const customerModal = new bootstrap.Modal(document.getElementById('customerModal'));
-const customerModalLabel = document.getElementById('customerModalLabel');
-const historyTable = document.getElementById('historyTable');
-
-
-
-
-$(document).ready(function() {
-    $("#adjustmentSearch").autocomplete({
-        source: function(request, response) {
-            fetch('api.php?action=get_product_suggestions&term=' + encodeURIComponent(request.term))
-                .then(res => res.json())
-                .then(data => response(data))
-                .catch(err => console.error('Autocomplete error:', err));
-        },
-        minLength: 2,
-        select: function(event, ui) {
-            adjustmentSearch.value = ui.item.value;
-            fetchStockAdjustments();
-        }
-    });
-});
-
-function fetchCustomers(search = '') {
-    const url = search ? `api.php?action=get_all_customers&search=${encodeURIComponent(search)}` : 'api.php?action=get_all_customers';
-    fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Customers Data:', data);
-            if (data.status === 'error') {
-                console.error('API Error:', data.message);
-                alert(`Error fetching customers: ${data.message}`);
-                customerTable.innerHTML = '<tr><td colspan="8" class="text-center">Failed to load customers: ' + data.message + '</td></tr>';
-                return;
-            }
-            customerTable.innerHTML = '';
-            if (Array.isArray(data) && data.length > 0) {
-                data.forEach(customer => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${customer.id}</td>
-                        <td>${customer.username}</td>
-                        <td>${customer.email}</td>
-                        <td>${customer.first_name || ''} ${customer.last_name || ''}</td>
-                        <td>${customer.phone || 'N/A'}</td>
-                        <td>${customer.address || 'N/A'}</td>
-                        <td>${customer.created_at}</td>
-                        <td>
-                            <button class="btn btn-sm btn-info" onclick="viewCustomerHistory(${customer.id}, '${customer.username}')">View History</button>
-                        </td>
-                    `;
-                    customerTable.appendChild(row);
-                });
-            } else {
-                customerTable.innerHTML = '<tr><td colspan="8" class="text-center">No customers found.</td></tr>';
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching customers:', error);
-            alert('Error fetching customers: ' + error.message);
-            customerTable.innerHTML = '<tr><td colspan="8" class="text-center">Failed to load customers: ' + error.message + '</td></tr>';
-        });
-}
-
-function viewCustomerHistory(id, username) {
-    customerModalLabel.textContent = `Purchase History for ${username}`;
-    fetch('api.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'get_customer_history', customer_id: id, csrf_token: document.querySelector('meta[name="csrf-token"]').content })
-    })
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            return response.json();
-        })
-        .then(data => {
-            console.log('History Data:', data);
-            if (data.status === 'error') {
-                console.error('API Error:', data.message);
-                alert(`Error fetching history: ${data.message}`);
-                historyTable.innerHTML = '<tr><td colspan="4" class="text-center">Failed to load history: ' + data.message + '</td></tr>';
-                return;
-            }
-            historyTable.innerHTML = '';
-            if (Array.isArray(data) && data.length > 0) {
-                data.forEach(sale => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${sale.sale_id}</td>
-                        <td>${sale.sale_date}</td>
-                        <td>$${parseFloat(sale.total_amount).toFixed(2)}</td>
-                        <td>${sale.status}</td>
-                    `;
-                    historyTable.appendChild(row);
-                });
-            } else {
-                historyTable.innerHTML = '<tr><td colspan="4" class="text-center">No purchase history found.</td></tr>';
-            }
-            customerModal.show();
-        })
-        .catch(error => {
-            console.error('Error fetching history:', error);
-            alert('Error fetching history: ' + error.message);
-            historyTable.innerHTML = '<tr><td colspan="4" class="text-center">Failed to load history: ' + error.message + '</td></tr>';
-        });
-}
-
-customerSearch.addEventListener('input', () => {
-    fetchCustomers(customerSearch.value);
-});
-
-function fetchDiscounts(attempts = 5, delay = 100) {
+        function fetchDiscounts(attempts = 5, delay = 100) {
     const discountTable = document.getElementById('discountTable');
     if (!discountTable && attempts > 0) {
         console.warn(`Discount table element not found, retrying... (${attempts} attempts left)`);
@@ -1889,6 +2116,1411 @@ function deleteDiscount(id) {
     });
 }
 
+
+
+function viewCustomerHistory(id, username) {
+    document.getElementById('customerModalLabel').textContent = `Purchase History for ${username}`;
+    document.getElementById('customerInfo').textContent = `Customer: ${username} (ID: ${id})`;
+    fetch('api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'get_customer_detailed_history', customer_id: id, csrf_token: csrfToken })
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.message || `HTTP ${response.status}: ${response.statusText}`);
+                }).catch(() => {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            const historyTable = document.getElementById('historyTable');
+            historyTable.innerHTML = '';
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach(sale => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${sale.sale_id}</td>
+                        <td>${new Date(sale.sale_date).toLocaleString()}</td>
+                        <td>${sale.product_name}</td>
+                        <td>${sale.quantity}</td>
+                        <td>$${parseFloat(sale.unit_price).toFixed(2)}</td>
+                        <td>$${parseFloat(sale.subtotal).toFixed(2)}</td>
+                        <td>$${parseFloat(sale.tax_amount).toFixed(2)}</td>
+                        <td>$${parseFloat(sale.final_amount).toFixed(2)}</td>
+                    `;
+                    historyTable.appendChild(row);
+                });
+            } else {
+                historyTable.innerHTML = '<tr><td colspan="8" class="text-center">No purchase history found.</td></tr>';
+            }
+            customerModal.show();
+        })
+        .catch(error => {
+            logError('Error fetching customer history: ' + error.message);
+            alert('Error fetching customer history: ' + error.message);
+            historyTable.innerHTML = '<tr><td colspan="8" class="text-center">Error loading history.</td></tr>';
+            customerModal.show();
+        });
+
+    document.getElementById('downloadCustomerHistoryPdf').onclick = () => {
+        const payload = {
+            action: 'generate_customer_history_pdf',
+            customer_id: id,
+            csrf_token: csrfToken
+        };
+        fetch('api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(response => {
+                const contentType = response.headers.get('Content-Type');
+                if (!response.ok) {
+                    if (contentType.includes('application/json')) {
+                        return response.json().then(err => {
+                            throw new Error(err.message || `HTTP ${response.status}: ${response.statusText}`);
+                        });
+                    }
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                if (!contentType.includes('application/pdf')) {
+                    return response.text().then(text => {
+                        try {
+                            const json = JSON.parse(text);
+                            throw new Error(json.message || 'Expected PDF but received invalid response');
+                        } catch {
+                            throw new Error('Expected PDF but received: ' + contentType);
+                        }
+                    });
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `CustomerHistory_${id}.pdf`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                logError('Error generating customer history PDF: ' + error.message);
+                alert('Error generating PDF: ' + error.message);
+            });
+    };
+}
+
+
+
+async function fetchForecast() {
+    try {
+        const startDate = document.getElementById('forecastStartDate').value;
+        const endDate = document.getElementById('forecastEndDate').value;
+        const days = document.getElementById('forecastDays').value;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content || '';
+         if (!csrfToken) console.warn('CSRF token not found');
+
+        if (!startDate || !endDate || !days) {
+            throw new Error('Please fill all required fields');
+        }
+
+        const forecastBtn = document.getElementById('fetchForecastBtn');
+        forecastBtn.disabled = true;
+        forecastBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
+
+        const response = await fetch(`api.php?action=get_sales_forecast&start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}&days=${encodeURIComponent(days)}`, {
+            headers: { 'X-CSRF-Token': csrfToken }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.status !== 'success' || !data.forecasts || !Array.isArray(data.forecasts)) {
+            throw new Error(data.message || 'No forecast data available');
+        }
+
+        const labels = data.forecasts.map(f => f.product_name);
+        const historicalData = data.forecasts.map(f => parseFloat(f.historical_sales) || 0);
+        const predictedData = data.forecasts.map(f => parseFloat(f.predicted_sales) || 0);
+
+        const ctx = document.getElementById('forecastChart').getContext('2d');
+
+        if (window.forecastChartInstance) {
+            window.forecastChartInstance.destroy();
+        }
+
+        window.forecastChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Historical Sales (Last Period)',
+                        data: historicalData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Predicted Sales (Next Period)',
+                        data: predictedData,
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Quantity Sold' }
+                    },
+                    x: { title: { display: true, text: 'Products' } }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: `Sales Forecast - Historical vs Predicted (${startDate} to ${endDate})`
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.raw}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        logError('Forecast error: ' + error.message);
+        alert('Error generating forecast: ' + error.message);
+    } finally {
+        const forecastBtn = document.getElementById('fetchForecastBtn');
+        forecastBtn.disabled = false;
+        forecastBtn.textContent = 'Generate Forecast';
+    }
+}
+
+
+
+function editCustomer(id, username, email, first_name, last_name, phone, address, loyalty_points) {
+    document.getElementById('editCustomerId').value = id;
+    document.getElementById('editUsername').value = username;
+    document.getElementById('editEmail').value = email;
+    document.getElementById('editFirstName').value = first_name;
+    document.getElementById('editLastName').value = last_name;
+    document.getElementById('editPhone').value = phone;
+    document.getElementById('editAddress').value = address;
+    document.getElementById('editLoyaltyPoints').value = loyalty_points;
+    customerEditModal.show();
+}
+
+
+
+function deleteCustomer(customerId) {
+    fetch('api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'delete_customer',
+            id: customerId,
+            csrf_token: document.querySelector('meta[name="csrf-token"]').content
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert('Customer deleted successfully');
+            fetchCustomers(); // Refresh the customer table
+        } else {
+            logError('Error deleting customer: ' + data.message);
+            if (data.message === 'Cannot delete customer with existing orders') {
+                alert('This customer has existing orders and cannot be deleted. Please review their order history.');
+            } else {
+                alert('Error: ' + data.message);
+            }
+        }
+    })
+    .catch(error => {
+        logError('Error deleting customer: ' + error);
+        alert('An error occurred while deleting the customer');
+    });
+}
+
+
+
+        function exportStockAdjustmentsCsv() {
+    const search = document.getElementById('adjustmentSearch').value;
+    const start_date = document.getElementById('adjustmentStartDate').value;
+    const end_date = document.getElementById('adjustmentEndDate').value;
+    let url = 'api.php?action=export_stock_adjustments_csv';
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+    if (start_date) url += `&start_date=${encodeURIComponent(start_date)}`;
+    if (end_date) url += `&end_date=${encodeURIComponent(end_date)}`;
+    window.location.href = url;
+}
+
+
+         function exportMostSoldCsv() {
+            const startDate = mostSoldStartDateInput.value;
+            const endDate = mostSoldEndDateInput.value;
+            if (!startDate || !endDate) {
+                alert('Please select both start and end dates.');
+                return;
+            }
+            window.location.href = `api.php?action=export_most_sold_products_csv&start_date=${startDate}&end_date=${endDate}`;
+        }
+
+
+
+function editProduct(id, name, categoryId, price, quantity, barcode, image_url, description) {
+        productModalLabel.textContent = 'Edit Product';
+        productIdInput.value = id;
+        productNameInput.value = name;
+        productCategoryInput.value = categoryId;
+        productPriceInput.value = price;
+        productQuantityInput.value = quantity;
+        productBarcodeInput.value = barcode;
+        document.getElementById('productImage').value = image_url;
+        document.getElementById('productDescription').value = description;
+        productModal.show();
+    }
+
+
+
+
+
+       
+
+
+
+
+
+function updateCartItemQuantity(index, change) {
+    const item = cart[index];
+    let newQuantity = typeof change === 'number' ? item.quantity + change : parseInt(change);
+    if (newQuantity < 1) newQuantity = 1;
+    
+    fetch(`api.php?action=get_product&id=${item.id}`, {
+        headers: { 'X-CSRF-Token': csrfToken }
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.json();
+        })
+        .then(product => {
+            if (newQuantity > product.quantity) {
+                alert(`Cannot set quantity to ${newQuantity}. Only ${product.quantity} available in stock.`);
+                return;
+            }
+            item.quantity = newQuantity;
+            updateProductQuantity(item.id, product.quantity - newQuantity + item.quantity);
+            updateCartTable();
+            updateCartBadge();
+        })
+        .catch(error => {
+            logError('Error updating cart item quantity: ' + error.message);
+            alert('Error updating cart item quantity: ' + error.message);
+        });
+}
+
+function removeCartItem(index) {
+    const item = cart[index];
+    fetch(`api.php?action=get_product&id=${item.id}`, {
+        headers: { 'X-CSRF-Token': csrfToken }
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.json();
+        })
+        .then(product => {
+            updateProductQuantity(item.id, product.quantity + item.quantity);
+            cart.splice(index, 1);
+            updateCartTable();
+            updateCartBadge();
+        })
+        .catch(error => {
+            logError('Error removing cart item: ' + error.message);
+            alert('Error removing cart item: ' + error.message);
+        });
+}
+
+
+function updatePaymentTotal() {
+        const paymentInputs = paymentMethods.querySelectorAll('.payment-amount');
+        let total = 0;
+        paymentInputs.forEach(input => {
+            total += parseFloat(input.value) || 0;
+        });
+        totalPaid.textContent = `$${total.toFixed(2)}`;
+        const cartTotalValue = parseFloat(cartTotal.textContent.replace('$', '')) || 0;
+        remainingBalance.textContent = `$${(cartTotalValue - total).toFixed(2)}`;
+    }
+
+function addPaymentMethodRow() {
+    const row = document.createElement('div');
+    row.className = 'payment-method mb-3';
+    row.innerHTML = `
+        <div class="row g-2">
+            <div class="col-md-5">
+                <select class="form-control payment-type">
+                    <option value="cash">Cash</option>
+                    <option value="credit_card">Credit Card</option>
+                    <option value="debit_card">Debit Card</option>
+                    <option value="loyalty_points">Loyalty Points</option>
+                </select>
+            </div>
+            <div class="col-md-5">
+                <input type="number" class="form-control payment-amount" placeholder="Amount" min="0" step="0.01">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-danger w-100 remove-payment">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    paymentMethods.appendChild(row);
+    row.querySelector('.payment-amount').addEventListener('input', updatePaymentTotal);
+    row.querySelector('.remove-payment').addEventListener('click', () => {
+        row.remove();
+        updatePaymentTotal();
+    });
+    updateRemoveButtons();
+}
+
+function updateRemoveButtons() {
+    const buttons = document.querySelectorAll('.remove-payment');
+    buttons.forEach(btn => btn.disabled = buttons.length <= 1);
+}
+
+addPaymentMethodBtn.addEventListener('click', addPaymentMethodRow);
+
+function generateReceipt(saleId, customerId) {
+    return fetch('api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify({
+            action: 'generate_receipt',
+            sale_id: saleId,
+            customer_id: customerId,
+            csrf_token: csrfToken
+        })
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.blob();
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Receipt_${saleId}.pdf`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        });
+}
+
+
+
+const applyLoyaltyPoints = document.getElementById('applyLoyaltyPoints');
+applyLoyaltyPoints.addEventListener('click', () => {
+    if (!customerId) {
+        alert('Please select a customer before redeeming points.');
+        return;
+    }
+    const pointsToUseValue = parseInt(loyaltyPointsToUse.value) || 0;
+    const availablePoints = parseInt(selectedCustomerPoints.textContent) || 0;
+    if (pointsToUseValue <= 0) {
+        alert('Please enter a valid number of points to redeem.');
+        return;
+    }
+    if (pointsToUseValue > availablePoints) {
+        alert(`Cannot redeem ${pointsToUseValue} points. Only ${availablePoints} points available.`);
+        return;
+    }
+    fetch('api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify({
+            action: 'redeem_loyalty_points',
+            customer_id: customerId,
+            points_to_redeem: pointsToUseValue,
+            csrf_token: csrfToken
+        })
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert(`Successfully redeemed ${pointsToUseValue} points for $${data.discount_amount.toFixed(2)} discount.`);
+                selectedCustomerPoints.textContent = `${data.new_points} points`;
+                updateCartTable();
+            } else {
+                alert('Error redeeming points: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            logError('Error redeeming loyalty points: ' + error.message);
+            alert('Error redeeming points: ' + error.message);
+        });
+});
+
+
+
+
+
+checkoutBtn.addEventListener('click', () => {
+    if (!customerId) {
+        alert('Please select a customer before checkout.');
+        return;
+    }
+    if (cart.length === 0) {
+        alert('Cart is empty. Please add products before checkout.');
+        return;
+    }
+    const total = parseFloat(cartTotal.textContent.replace('$', '')) || 0;
+    const paid = parseFloat(totalPaid.textContent.replace('$', '')) || 0;
+    if (paid < total) {
+        alert(`Total payment ($${paid.toFixed(2)}) is less than cart total ($${total.toFixed(2)}).`);
+        return;
+    }
+    if (paid > total) {
+        alert(`Total payment ($${paid.toFixed(2)}) exceeds cart total ($${total.toFixed(2)}). Please adjust payment amounts.`);
+        return;
+    }
+    const paymentMethodsData = Array.from(document.querySelectorAll('.payment-method')).map(pm => ({
+        type: pm.querySelector('.payment-type').value,
+        amount: parseFloat(pm.querySelector('.payment-amount').value) || 0
+    }));
+    if (paymentMethodsData.some(pm => pm.amount < 0)) {
+        alert('Payment amounts cannot be negative.');
+        return;
+    }
+    const subtotal = parseFloat(cartSubtotal.textContent.replace('$', '')) || 0;
+    const pointsEarned = Math.floor(subtotal * POINTS_PER_DOLLAR);
+    const pointsToRedeem = parseInt(loyaltyPointsToUse.value) || 0;
+    const payload = {
+        action: 'checkout',
+        customer_id: customerId,
+        items: cart.map(item => ({ id: item.id, quantity: item.quantity })),
+        points_earned: pointsEarned,
+        points_redeemed: pointsToRedeem,
+        payment_methods: paymentMethodsData,
+        csrf_token: csrfToken
+    };
+    fetch('api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify(payload)
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert('Sale processed successfully! Sale ID: ' + data.sale_id);
+                generateReceipt(data.sale_id, customerId)
+                    .catch(error => {
+                        logError('Error generating receipt: ' + error.message);
+                        alert('Sale processed, but error generating receipt: ' + error.message);
+                    })
+                    .finally(() => {
+                        fetchDashboardSummary();
+                        fetchDailySalesTrend();
+                        fetchLowStockProducts();
+                        cart = [];
+                        customerId = null;
+                        selectedCustomerInfo.style.display = 'none';
+                        cartCustomerSearch.value = '';
+                        loyaltyPointsToUse.value = '0';
+                        paymentMethods.innerHTML = `
+                            <div class="payment-method mb-3">
+                                <div class="row g-2">
+                                    <div class="col-md-5">
+                                        <select class="form-control payment-type">
+                                            <option value="cash">Cash</option>
+                                            <option value="credit_card">Credit Card</option>
+                                            <option value="debit_card">Debit Card</option>
+                                            <option value="loyalty_points">Loyalty Points</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <input type="number" class="form-control payment-amount" placeholder="Amount" min="0" step="0.01">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-danger w-100 remove-payment" disabled>
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        updateCartTable();
+                        updateCartBadge();
+                    });
+            } else {
+                alert('Error processing sale: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            logError('Error during checkout: ' + error.message);
+            alert('Error during checkout: ' + error.message);
+        });
+});
+
+// Event Listeners for Cart Section
+cartCustomerSearch.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(searchCustomers, 300);
+});
+
+
+
+document.getElementById('searchCustomerBtn').addEventListener('click', searchCustomers);
+removeCustomerBtn.addEventListener('click', () => {
+    customerId = null;
+    selectedCustomerInfo.style.display = 'none';
+    checkoutBtn.disabled = true;
+});
+
+
+addPaymentMethodBtn.addEventListener('click', addPaymentMethodRow);
+
+
+const paymentAmountInput = paymentMethods.querySelector('.payment-amount');
+if (paymentAmountInput) {
+    paymentAmountInput.addEventListener('input', updatePaymentTotal);
+}
+
+const navLinks = document.querySelectorAll('.nav-link[data-section]');
+const sections = document.querySelectorAll('.section');
+
+navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        navLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        sections.forEach(s => s.classList.remove('active'));
+        const sectionId = link.dataset.section;
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.classList.add('active');
+            switch (sectionId) {
+                case 'dashboard':
+                    fetchDashboardSummary();
+                    fetchDailySalesTrend();
+                    fetchLowStockProducts();
+                    break;
+                case 'product-catalog':
+                    fetchProducts();
+                    break;
+                case 'cart-section':
+                    updateCartTable();
+                    break;
+                case 'inventory':
+                    fetchInventory();
+                    break;
+                case 'discounts':
+                    fetchDiscounts();
+                    break;
+                case 'customers':
+                    fetchCustomers();
+                    break;
+                case 'stock_adjustments':
+                    fetchStockAdjustments();
+                    break;
+                case 'sales-report':
+                    fetchSalesReport();
+                    break;
+                case 'most-sold-products':
+                    fetchMostSoldProducts();
+                    break;
+                case 'sales-forecasting':
+                    fetchForecast();
+                    break;
+            }
+        }
+    });
+});
+
+function addToCart(productId, quantity) {
+    fetch(`api.php?action=get_product&id=${productId}`, {
+        headers: { 'X-CSRF-Token': csrfToken }
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.json();
+        })
+        .then(product => {
+            if (!product || product.success === false) {
+                throw new Error(product.message || 'Product not found');
+            }
+            const availableQuantity = parseInt(product.quantity) || 0;
+            if (availableQuantity < quantity) {
+                alert(`Cannot add ${quantity} items. Only ${availableQuantity} available in stock.`);
+                return;
+            }
+            const existingItem = cart.find(item => item.id === product.id);
+            const newQuantity = existingItem ? existingItem.quantity + quantity : quantity;
+            if (newQuantity > availableQuantity) {
+                alert(`Cannot add ${newQuantity} items. Only ${availableQuantity} available in stock.`);
+                return;
+            }
+            if (existingItem) {
+                existingItem.quantity = newQuantity;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: parseFloat(product.price),
+                    quantity: quantity,
+                    category_id: product.category_id
+                });
+            }
+            updateCartBadge();
+            showToast(`Added ${quantity} x ${product.name} to cart.`);
+            updateProductQuantity(product.id, availableQuantity - quantity);
+            updateCartTable(); // Refresh cart display
+        })
+        .catch(error => {
+            logError('Error adding to cart: ' + error.message);
+            alert('Error adding to cart: ' + error.message);
+        });
+}
+
+function updateProductQuantity(productId, newQuantity) {
+    fetch('api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify({
+            action: 'update_product_quantity',
+            id: productId,
+            quantity: newQuantity,
+            csrf_token: csrfToken
+        })
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                fetchProducts(); // Refresh product catalog to reflect updated stock
+                fetchLowStockProducts(); // Update low stock alerts
+            } else {
+                throw new Error(data.message || 'Unknown error');
+            }
+        })
+        .catch(error => {
+            logError('Error updating product quantity: ' + error.message);
+            alert('Error updating product quantity: ' + error.message);
+        });
+}
+
+function updateCartBadge() {
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartItemCountBadge.textContent = totalItems;
+    cartItemCount.textContent = `${totalItems} items`;
+}
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-notification show';
+    toast.innerHTML = `
+        <div class="toast-header">
+            <strong class="me-auto">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">${message}</div>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+
+// Debounce function
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Event Listeners for Product Catalog
+const debouncedFetchProducts = debounce(() => {
+    const search = productSearch.value.trim();
+    const categoryId = productCategoryFilter.value || null;
+    console.log(`Fetching products with search: ${search}, category: ${categoryId}`);
+    fetchProducts(1, 10, search, categoryId);
+}, 300);
+
+searchProductsBtn.addEventListener('click', debouncedFetchProducts);
+resetFiltersBtn.addEventListener('click', () => {
+    productSearch.value = '';
+    productCategoryFilter.value = '';
+    productSuggestions.innerHTML = '';
+    productSuggestions.style.display = 'none';
+    debouncedFetchProducts();
+});
+productSearch.addEventListener('input', debouncedFetchProducts);
+productCategoryFilter.addEventListener('change', debouncedFetchProducts);
+
+// Initialize Product Catalog
+if (document.getElementById('product-catalog').classList.contains('active')) {
+    debouncedFetchProducts();
+}
+
+
+productCategoryFilter.addEventListener('change', () => {
+    const categoryId = productCategoryFilter.value || null;
+    console.log(`Category filter changed: ${categoryId}`);
+    fetchProducts(1, 10, productSearch.value.trim(), categoryId);
+});
+
+// Initialize Product Catalog
+fetchProducts();
+
+
+function adjustQuantity(index, change) {
+    const item = cart[index];
+    const newQuantity = item.quantity + change;
+    const maxQuantity = item.maxQuantity;
+    if (newQuantity < 1) {
+        removeFromCart(index);
+        return;
+    }
+    if (newQuantity > maxQuantity) {
+        alert(`Only ${maxQuantity} units of ${item.name} are available.`);
+        return;
+    }
+    item.quantity = newQuantity;
+    updateCartTable();
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCartTable();
+}
+
+let customerTimeout;
+
+function setupAutocomplete(input, suggestionsContainer, apiAction, minLength = 2, onSelect) {
+    let timeout;
+    input.addEventListener('input', () => {
+        clearTimeout(timeout);
+        const query = input.value.trim();
+        suggestionsContainer.style.display = query.length >= minLength ? 'block' : 'none';
+        if (query.length < minLength) {
+            suggestionsContainer.innerHTML = '';
+            return;
+        }
+        timeout = setTimeout(async () => {
+            try {
+                const response = await fetch(`api.php?action=${apiAction}&term=${encodeURIComponent(query)}`, {
+                    headers: { 'X-CSRF-Token': csrfToken }
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                const items = await response.json();
+                const suggestions = Array.isArray(items) ? items : [];
+                suggestionsContainer.innerHTML = suggestions.length > 0
+                    ? suggestions.map(item => `<div class="autocomplete-item">${item}</div>`).join('')
+                    : '<div class="autocomplete-item">No suggestions found.</div>';
+                suggestionsContainer.querySelectorAll('.autocomplete-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        input.value = item.textContent;
+                        suggestionsContainer.style.display = 'none';
+                        onSelect(item.textContent);
+                    });
+                });
+            } catch (error) {
+                logError(`Autocomplete error for ${apiAction}: ${error.message}`);
+                suggestionsContainer.innerHTML = '<div class="autocomplete-item text-danger">Error loading suggestions</div>';
+                suggestionsContainer.style.display = 'block';
+            }
+        }, 300);
+    });
+    document.addEventListener('click', e => {
+        if (!input.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+}
+
+setupAutocomplete(customerSearchBar, customerSuggestions, 'search_customers', 2, query => searchCustomers());
+setupAutocomplete(productSearchBar, productSuggestions, 'search_products', 2, query => fetchProducts());
+setupAutocomplete(adjustmentSearch, suggestionList, 'get_product_suggestions', 2, query => fetchStockAdjustments());
+
+// Product Search Autocomplete
+// Product Search Autocomplete
+let productTimeout;
+productSearchBar.addEventListener('input', () => {
+    clearTimeout(productTimeout);
+    const query = productSearchBar.value.trim();
+    if (query.length < 2) {
+        productSuggestions.innerHTML = '';
+        productSuggestions.style.display = 'none';
+        fetchProducts(1, 10, ''); // Reset product list if query is too short
+        return;
+    }
+    productTimeout = setTimeout(() => {
+        fetch(`api.php?action=search_products&term=${encodeURIComponent(query)}`, {
+            headers: { 'X-CSRF-Token': csrfToken }
+        })
+            .then(response => {
+                console.log('Search Products Response Status:', response.status);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Search Products Data:', data);
+                productSuggestions.innerHTML = '';
+                // Handle API response: expect array or handle error object
+                let products = [];
+                if (Array.isArray(data)) {
+                    products = data;
+                } else if (data.status === 'error') {
+                    console.warn('API error:', data.message);
+                    products = [];
+                } else {
+                    console.warn('Unexpected response format:', data);
+                    products = [];
+                }
+                if (products.length > 0) {
+                    products.forEach(product => {
+                        const div = document.createElement('div');
+                        div.className = 'autocomplete-item';
+                        div.textContent = `${product.name} (Barcode: ${product.barcode || 'N/A'}) - $${parseFloat(product.price || 0).toFixed(2)} (Qty: ${product.quantity || 0})`;
+                        div.addEventListener('click', () => {
+                            productSearchBar.value = product.name;
+                            productSuggestions.innerHTML = '';
+                            productSuggestions.style.display = 'none';
+                            fetchProducts(1, 10, product.name);
+                        });
+                        productSuggestions.appendChild(div);
+                    });
+                    productSuggestions.style.display = 'block';
+                    positionSuggestions(productSearchBar, productSuggestions);
+                } else {
+                    productSuggestions.innerHTML = '<div class="autocomplete-item">No products found.</div>';
+                    productSuggestions.style.display = 'block';
+                    positionSuggestions(productSearchBar, productSuggestions);
+                }
+            })
+            .catch(error => {
+                logError('Error searching products: ' + error.message);
+                console.error('Error searching products:', error);
+                productSuggestions.innerHTML = '<div class="autocomplete-item text-danger">Error loading suggestions</div>';
+                productSuggestions.style.display = 'block';
+                positionSuggestions(productSearchBar, productSuggestions);
+            });
+    }, 300);
+});
+
+document.addEventListener('click', (e) => {
+    if (!customerSearchBar.contains(e.target) && !customerSuggestions.contains(e.target)) {
+        customerSuggestions.style.display = 'none';
+    }
+    if (!productSearchBar.contains(e.target) && !productSuggestions.contains(e.target)) {
+        productSuggestions.style.display = 'none';
+    }
+});
+
+// addToCartBtn.addEventListener('click', () => {
+//     if (!selectedProduct) {
+//         alert('Please select a product.');
+//         return;
+//     }
+//     const quantity = parseInt(quantityInput.value);
+//     if (quantity <= 0) {
+//         alert('Please enter a valid quantity.');
+//         return;
+//     }
+//     const maxQuantity = selectedProduct.maxQuantity;
+//     if (quantity > maxQuantity) {
+//         alert(`Only ${maxQuantity} units of ${selectedProduct.name} are available.`);
+//         return;
+//     }
+//     const existingItem = cart.find(item => item.id === selectedProduct.id);
+//     if (existingItem) {
+//         const newQuantity = existingItem.quantity + quantity;
+//         if (newQuantity > maxQuantity) {
+//             alert(`Cannot add ${newQuantity} units. Only ${maxQuantity} units are available.`);
+//             return;
+//         }
+//         existingItem.quantity = newQuantity;
+//     } else {
+//         cart.push({
+//             id: selectedProduct.id,
+//             name: selectedProduct.name,
+//             price: selectedProduct.price,
+//             quantity: quantity,
+//             maxQuantity: maxQuantity
+//         });
+//     }
+//     updateCartTable();
+//     quantityInput.value = 1;
+//     productSearchBar.value = '';
+//     selectedProductDiv.textContent = '';
+//     selectedProduct = null;
+// });
+
+function generateReceipt(saleId, customerId) {
+    const receiptPayload = {
+        action: 'generate_receipt',
+        sale_id: saleId,
+        customer_id: customerId,
+        csrf_token: csrfToken
+    };
+    return fetch('api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify(receiptPayload)
+    })
+        .then(response => {
+            const contentType = response.headers.get('Content-Type');
+            if (!response.ok) {
+                if (contentType.includes('application/json')) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || 'Failed to generate receipt');
+                    });
+                }
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            if (!contentType.includes('application/pdf')) {
+                return response.text().then(text => {
+                    throw new Error('Expected PDF but received: ' + contentType);
+                });
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Receipt_${saleId}.pdf`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            retryReceiptBtn.classList.add('d-none');
+        });
+}
+
+
+
+
+checkoutBtn.addEventListener('click', () => {
+    if (!customerId) {
+        alert('Please select a customer.');
+        return;
+    }
+    if (cart.length === 0) {
+        alert('Cart is empty. Please add products to proceed.');
+        return;
+    }
+    const pointsToRedeem = parseInt(document.getElementById('loyaltyPointsRedeem').value) || 0;
+    const availablePoints = parseInt(document.getElementById('loyaltyPointsInfo').textContent.match(/\d+/)[0]) || 0;
+    if (pointsToRedeem > availablePoints) {
+        alert(`Cannot redeem ${pointsToRedeem} points. Only ${availablePoints} points available.`);
+        return;
+    }
+
+    // Validate inventory
+    const invalidItems = cart.filter(item => item.quantity > item.maxQuantity);
+    if (invalidItems.length > 0) {
+        alert(`Invalid quantities for: ${invalidItems.map(item => item.name).join(', ')}`);
+        return;
+    }
+
+    // Validate payment methods
+    const paymentMethods = Array.from(document.querySelectorAll('.payment-method-row')).map(row => {
+        const method = row.querySelector('.payment-method-select').value;
+        const amount = parseFloat(row.querySelector('.payment-method-amount').value) || 0;
+        return { method, amount };
+    });
+    const paymentTotal = paymentMethods.reduce((sum, pm) => sum + pm.amount, 0);
+    const cartTotal = parseFloat(document.getElementById('cartTotal').textContent);
+    if (paymentTotal < cartTotal) {
+        alert(`Total payment ($${paymentTotal.toFixed(2)}) is less than cart total ($${cartTotal.toFixed(2)}).`);
+        return;
+    }
+    if (paymentTotal > cartTotal) {
+        alert(`Total payment ($${paymentTotal.toFixed(2)}) exceeds cart total ($${cartTotal.toFixed(2)}). Please adjust payment amounts.`);
+        return;
+    }
+    if (paymentMethods.some(pm => pm.amount < 0)) {
+        alert('Payment amounts cannot be negative.');
+        return;
+    }
+
+    const subtotal = parseFloat(document.getElementById('subtotal').textContent);
+    if (subtotal > 1000 && !confirm('Confirm high-value transaction of $' + subtotal.toFixed(2) + '?')) {
+        return;
+    }
+    const pointsEarned = Math.floor(subtotal * POINTS_PER_DOLLAR);
+    const payload = {
+        action: 'checkout',
+        customer_id: customerId,
+        items: cart.map(item => ({ id: item.id, quantity: item.quantity })),
+        points_earned: pointsEarned,
+        points_redeemed: pointsToRedeem,
+        payment_methods: paymentMethods,
+        csrf_token: csrfToken
+    };
+    fetch('api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify(payload)
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert('Sale processed successfully! Sale ID: ' + data.sale_id);
+                document.getElementById('loyaltyPointsInfo').textContent = `${data.new_points || 0} points available (100 points = $1 discount)`;
+                generateReceipt(data.sale_id, customerId)
+                    .catch(error => {
+                        logError('Error generating receipt: ' + error.message);
+                        alert('Sale processed, but error generating receipt: ' + error.message);
+                        retryReceiptBtn.classList.remove('d-none');
+                        retryReceiptBtn.dataset.saleId = data.sale_id;
+                        retryReceiptBtn.dataset.customerId = customerId;
+                    })
+                    .finally(() => {
+                        fetchDashboardSummary();
+                        fetchDailySalesTrend();
+                        fetchLowStockProducts();
+                        cart = [];
+                        updateCartTable();
+                        customerSearchBar.value = '';
+                        selectedCustomerDiv.textContent = '';
+                        customerId = null;
+                        document.getElementById('loyaltyPointsRedeem').value = 0;
+                        document.getElementById('loyaltyPointsInfo').textContent = '0 points available (100 points = $1 discount)';
+                        // Reset payment methods
+                        paymentMethodsContainer.innerHTML = `
+                            <div class="payment-method-row" style="display: flex; margin-bottom: 5px;">
+                                <select class="payment-method-select" style="margin-right: 10px;">
+                                    <option value="Cash">Cash</option>
+                                    <option value="Credit Card">Credit Card</option>
+                                    <option value="Loyalty Points">Loyalty Points</option>
+                                </select>
+                                <input type="number" class="payment-method-amount" placeholder="Amount" step="0.01" min="0" style="margin-right: 10px;" />
+                                <button type="button" class="remove-payment-method" style="display: none;">Remove</button>
+                            </div>
+                        `;
+                        paymentTotalSpan.textContent = '0.00';
+                        const paymentAmountInput = paymentMethodsContainer.querySelector('.payment-amount');
+if (paymentAmountInput) {
+    paymentAmountInput.addEventListener('input', updatePaymentTotal);
+}
+                    });
+            } else {
+                alert('Error processing sale: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            logError('Error during checkout: ' + error.message);
+            alert('Error during checkout: ' + error.message);
+        });
+});
+
+
+
+// if (retryReceiptBtn) {
+//     retryReceiptBtn.addEventListener('click', () => {
+//         const saleId = retryReceiptBtn.dataset.saleId;
+//         const customerId = retryReceiptBtn.dataset.customerId;
+//         generateReceipt(saleId, customerId).catch(error => {
+//             logError('Error retrying receipt: ' + error.message);
+//             alert('Error retrying receipt: ' + error.message);
+//         });
+//     });
+// }
+
+
+
+
+        // Sales Report Functions
+
+
+    
+
+       
+
+        
+
+        
+
+
+
+       
+
+       
+
+        // Inventory Functions
+  
+       
+      
+
+
+
+// Hide suggestions when clicking outside
+document.addEventListener('click', (e) => {
+    if (!adjustmentSearch.contains(e.target) && !suggestionList.contains(e.target)) {
+        suggestionList.style.display = 'none';
+    }
+});
+
+     
+
+
+
+       
+
+        async function submitForm(form, modal, action, payload, successMessage, refreshCallback) {
+    try {
+        const response = await fetch('api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...payload, action, csrf_token: csrfToken })
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const data = await response.json();
+        if (data.success || data.status === 'success') {
+            alert(successMessage);
+            modal.hide();
+            form.reset();
+            refreshCallback();
+        } else {
+            throw new Error(data.message || 'Unknown error');
+        }
+    } catch (error) {
+        logError(`Error in ${action}: ${error.message}`);
+        alert(`Error in ${action}: ${error.message}`);
+    }
+}
+
+productForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const id = productIdInput.value;
+    submitForm(
+        productForm,
+        productModal,
+        id ? 'update_product' : 'add_product',
+        {
+            id: id || null,
+            name: productNameInput.value,
+            category_id: productCategoryInput.value,
+            price: parseFloat(productPriceInput.value),
+            quantity: parseInt(productQuantityInput.value),
+            barcode: productBarcodeInput.value,
+            image_url: document.getElementById('productImage').value,
+            description: document.getElementById('productDescription').value
+        },
+        id ? 'Product updated successfully.' : 'Product added successfully.',
+        () => { fetchInventory(); fetchLowStockProducts(); }
+    );
+});
+
+discountForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const id = discountIdInput.value;
+    submitForm(
+        discountForm,
+        discountModal,
+        id ? 'update_discount' : 'add_discount',
+        {
+            id: id || null,
+            name: discountNameInput.value,
+            type: discountTypeInput.value,
+            value: parseFloat(discountValueInput.value),
+            min_purchase_amount: discountMinPurchaseInput.value ? parseFloat(discountMinPurchaseInput.value) : null,
+            product_id: discountProductInput.value || null,
+            category_id: discountCategoryInput.value || null,
+            start_date: discountStartDateInput.value.replace('T', ' '),
+            end_date: discountEndDateInput.value.replace('T', ' '),
+            is_active: discountIsActiveInput.checked
+        },
+        id ? 'Discount updated successfully.' : 'Discount added successfully.',
+        fetchDiscounts
+    );
+});
+
+        document.getElementById('addProductBtn').addEventListener('click', () => {
+            productModalLabel.textContent = 'Add Product';
+            productForm.reset();
+            productIdInput.value = '';
+        });
+
+
+
+
+
+
+$(document).ready(function() {
+    $("#adjustmentSearch").autocomplete({
+        source: function(request, response) {
+            fetch('api.php?action=get_product_suggestions&term=' + encodeURIComponent(request.term))
+                .then(res => res.json())
+                .then(data => response(data))
+                .catch(err => console.error('Autocomplete error:', err));
+        },
+        minLength: 2,
+        select: function(event, ui) {
+            adjustmentSearch.value = ui.item.value;
+            fetchStockAdjustments();
+        }
+    });
+});
+
+
+document.addEventListener('click', (e) => {
+    if (!customerSearch.contains(e.target) && !customerSuggestions.contains(e.target)) {
+        customerSuggestions.style.display = 'none';
+        customerSearch.classList.remove('has-suggestions');
+    }
+});
+
+customerSearch.addEventListener('keydown', (e) => {
+    const items = customerSuggestions.querySelectorAll('.suggestion-item');
+    let activeItem = customerSuggestions.querySelector('.suggestion-item.active');
+    if (!customerSuggestions.style.display || customerSuggestions.style.display === 'none') return;
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!activeItem) {
+            items[0]?.classList.add('active');
+        } else {
+            activeItem.classList.remove('active');
+            const next = activeItem.nextElementSibling;
+            if (next) next.classList.add('active');
+        }
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (activeItem) {
+            activeItem.classList.remove('active');
+            const prev = activeItem.previousElementSibling;
+            if (prev) prev.classList.add('active');
+        }
+    } else if (e.key === 'Enter' && activeItem) {
+        e.preventDefault();
+        activeItem.click();
+    }
+});
+
+customerSearchBtn.addEventListener('click', () => {
+    fetchCustomers(customerSearch.value);
+});
+
+customerSearch.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        fetchCustomers(customerSearch.value);
+    }
+});
+
+customerCreateForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const payload = {
+        action: 'add_customer',
+        username: document.getElementById('createUsername').value,
+        email: document.getElementById('createEmail').value,
+        first_name: document.getElementById('createFirstName').value || null,
+        last_name: document.getElementById('createLastName').value || null,
+        phone: document.getElementById('createPhone').value || null,
+        address: document.getElementById('createAddress').value || null,
+        csrf_token: csrfToken
+    };
+    fetch('api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Customer created successfully.');
+                customerCreateModal.hide();
+                customerCreateForm.reset();
+                fetchCustomers();
+            } else {
+                throw new Error(data.message || 'Unknown error');
+            }
+        })
+        .catch(error => {
+            logError('Error creating customer: ' + error.message);
+            alert('Error creating customer: ' + error.message);
+        });
+});
+
+customerEditForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const payload = {
+        action: 'update_customer',
+        id: document.getElementById('editCustomerId').value,
+        username: document.getElementById('editUsername').value,
+        email: document.getElementById('editEmail').value,
+        first_name: document.getElementById('editFirstName').value || null,
+        last_name: document.getElementById('editLastName').value || null,
+        phone: document.getElementById('editPhone').value || null,
+        address: document.getElementById('editAddress').value || null,
+        csrf_token: csrfToken
+    };
+    fetch('api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Customer updated successfully.');
+                customerEditModal.hide();
+                fetchCustomers();
+            } else {
+                throw new Error(data.message || 'Unknown error');
+            }
+        })
+        .catch(error => {
+            logError('Error updating customer: ' + error.message);
+            alert('Error updating customer: ' + error.message);
+        });
+});
+
+
+
+
+
+
+
+
+
+
 discountForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const action = discountIdInput.value ? 'update_discount' : 'add_discount';
@@ -1927,253 +3559,46 @@ discountForm.addEventListener('submit', (e) => {
     });
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            const sectionId = link.getAttribute('data-section');
-            console.log(`Navigating to section: ${sectionId}`);
-            document.querySelectorAll('.section').forEach(section => {
-                section.style.display = section.id === sectionId ? 'block' : 'none';
-                console.log(`Section ${section.id} display: ${section.style.display}`);
-            });
-            navLinks.forEach(nav => nav.classList.remove('active'));
-            link.classList.add('active');
-            if (sectionId === 'dashboard') {
-                fetchDashboardSummary();
-                fetchDailySalesTrend();
-                fetchLowStockProducts();
-            } else if (sectionId === 'inventory') {
-                fetchInventory();
-            } else if (sectionId === 'discounts') {
-                console.log('Calling fetchDiscounts');
-                fetchDiscounts();
-            }
-        });
-    });
-    // Initialize Dashboard
-    document.querySelector('.nav-link[data-section="dashboard"]').click();
-    document.getElementById('fetchForecastBtn').addEventListener('click', fetchForecast);
-});
+
 
 document.getElementById('addDiscountBtn').addEventListener('click', () => {
     discountModalLabel.textContent = 'Add Discount';
     discountForm.reset();
-    discountIdInput.value = ''; 
+    discountIdInput.value = '';
 });
 
 
-// Global variable to track editing state
-window.editingAdjustmentId = null;
 
-// Function to fetch stock adjustments
-function fetchStockAdjustments() {
-    const adjustmentTable = document.getElementById('adjustmentTable');
-    const adjustmentSearch = document.getElementById('adjustmentSearch');
-    const adjustmentStartDate = document.getElementById('adjustmentStartDate');
-    const adjustmentEndDate = document.getElementById('adjustmentEndDate');
 
-    if (!adjustmentTable || !adjustmentSearch || !adjustmentStartDate || !adjustmentEndDate) {
-        console.error('Required Stock Adjustments elements are missing for fetchStockAdjustments');
-        return;
-    }
-
-    const search = adjustmentSearch.value;
-    const start_date = adjustmentStartDate.value;
-    const end_date = adjustmentEndDate.value;
-    let url = 'api.php?action=get_stock_adjustments';
-    if (search) url += `&search=${encodeURIComponent(search)}`;
-    if (start_date) url += `&start_date=${encodeURIComponent(start_date)}`;
-    if (end_date) url += `&end_date=${encodeURIComponent(end_date)}`;
-
-    fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Stock Adjustments API Response:', data); // Add this for debugging
-            adjustmentTable.innerHTML = '';
-            if (data.status === 'error') {
-                adjustmentTable.innerHTML = `<tr><td colspan="10" class="text-center">Error: ${data.message}</td></tr>`;
-                return;
-            }
-            if (Array.isArray(data) && data.length > 0) {
-                data.forEach(adjustment => {
-                    const row = document.createElement('tr');
-                    row.setAttribute('data-adjustment-id', adjustment.id);
-                    row.innerHTML = `
-                        <td>${adjustment.id}</td>
-                        <td>${adjustment.product_name || 'N/A'}</td>
-                        <td>${adjustment.quantity_before !== null ? adjustment.quantity_before : 'N/A'}</td>
-                        <td>${adjustment.adjustment_value > 0 ? '+' : ''}${adjustment.adjustment_value}</td>
-                        <td>${adjustment.quantity_after !== null ? adjustment.quantity_after : 'N/A'}</td>
-                        <td>${adjustment.reason_name || 'N/A'}</td>
-                        <td>${adjustment.notes || 'N/A'}</td>
-                        <td>${adjustment.user_name || 'N/A'}</td>
-                        <td>${adjustment.adjusted_at}</td>
-                        <td>
-                            <button class="btn btn-sm btn-warning me-2" onclick="editAdjustment(${adjustment.id})">Edit</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteAdjustment(${adjustment.id})">Delete</button>
-                        </td>
-                    `;
-                    adjustmentTable.appendChild(row);
-                });
-            } else {
-                adjustmentTable.innerHTML = '<tr><td colspan="10" class="text-center">No adjustments found.</td></tr>';
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching adjustments:', error);
-            adjustmentTable.innerHTML = `<tr><td colspan="10" class="text-center">Error: ${error.message}</td></tr>`;
-            if (typeof logError === 'function') {
-                logError('Failed to fetch stock adjustments: ' + error.message);
-            }
-        });
-}
-
-// Function to edit an adjustment
-function editAdjustment(id) {
-    const row = document.querySelector(`tr[data-adjustment-id="${id}"]`);
-    if (!row) return;
-
-    const adjustmentProduct = document.getElementById('adjustmentProduct');
-    const adjustmentProductId = document.getElementById('adjustmentProductId');
-    const adjustmentValue = document.getElementById('adjustmentValue');
-    const adjustmentReason = document.getElementById('adjustmentReason');
-    const adjustmentNotes = document.getElementById('adjustmentNotes');
-    const adjustmentFormTitle = document.getElementById('adjustmentFormTitle');
-    const submitAdjustmentBtn = document.getElementById('submitAdjustmentBtn');
-    const cancelEditBtn = document.getElementById('cancelEditBtn');
-
-    if (!adjustmentProduct || !adjustmentProductId || !adjustmentValue || !adjustmentReason || 
-        !adjustmentNotes || !adjustmentFormTitle || !submitAdjustmentBtn || !cancelEditBtn) {
-        console.error('Required form elements for editAdjustment are missing');
-        return;
-    }
-
-    window.editingAdjustmentId = id;
-    adjustmentProduct.value = row.cells[1].textContent;
-    adjustmentProductId.value = '';
-    adjustmentValue.value = parseInt(row.cells[3].textContent);
-    adjustmentNotes.value = row.cells[6].textContent === 'N/A' ? '' : row.cells[6].textContent;
-
-    // Fetch product ID
-    fetch(`api.php?action=search_products&query=${encodeURIComponent(row.cells[1].textContent)}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.products && data.products.length > 0) {
-                adjustmentProductId.value = data.products[0].id;
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching product ID:', error);
-            if (typeof logError === 'function') {
-                logError('Failed to fetch product ID for editing adjustment: ' + error.message);
-            }
-        });
-
-    // Fetch reason ID
-    fetch(`api.php?action=get_adjustment_reasons`)
-        .then(res => res.json())
-        .then(reasons => {
-            const reasonName = row.cells[5].textContent;
-            const reason = reasons.find(r => r.name === reasonName);
-            if (reason) {
-                adjustmentReason.value = reason.id;
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching reasons:', error);
-            if (typeof logError === 'function') {
-                logError('Failed to fetch adjustment reasons: ' + error.message);
-            }
-        });
-
-    adjustmentFormTitle.textContent = 'Edit Stock Adjustment';
-    submitAdjustmentBtn.textContent = 'Update Adjustment';
-    cancelEditBtn.style.display = 'inline-block';
-}
-
-// Function to delete an adjustment
-function deleteAdjustment(id) {
-    if (!confirm('Are you sure you want to delete this adjustment?')) return;
-
-    fetch('api.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            action: 'delete_stock_adjustment',
-            id: id,
-            csrf_token: csrfToken
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Adjustment deleted successfully!');
-            fetchStockAdjustments();
-        } else {
-            throw new Error(data.message || 'Failed to delete adjustment');
-        }
-    })
-    .catch(error => {
-        console.error('Error deleting adjustment:', error);
-        alert('Error deleting adjustment: ' + error.message);
-        if (typeof logError === 'function') {
-            logError('Failed to delete stock adjustment: ' + error.message);
-        }
-    });
-}
-
-// Function to reset the adjustment form
-function resetAdjustmentForm() {
-    const adjustmentForm = document.getElementById('adjustmentForm');
-    const adjustmentProductId = document.getElementById('adjustmentProductId');
-    const adjustmentFormTitle = document.getElementById('adjustmentFormTitle');
-    const submitAdjustmentBtn = document.getElementById('submitAdjustmentBtn');
-    const cancelEditBtn = document.getElementById('cancelEditBtn');
-
-    if (!adjustmentForm || !adjustmentProductId || !adjustmentFormTitle || !submitAdjustmentBtn || !cancelEditBtn) {
-        console.error('Required form elements for resetAdjustmentForm are missing');
-        return;
-    }
-
-    adjustmentForm.reset();
-    adjustmentProductId.value = '';
-    window.editingAdjustmentId = null;
-    adjustmentFormTitle.textContent = 'Add New Stock Adjustment';
-    submitAdjustmentBtn.textContent = 'Add Adjustment';
-    cancelEditBtn.style.display = 'none';
-}
-
-// Initialize event listeners after DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     const adjustmentTable = document.getElementById('adjustmentTable');
     const adjustmentSearch = document.getElementById('adjustmentSearch');
     const adjustmentStartDate = document.getElementById('adjustmentStartDate');
     const adjustmentEndDate = document.getElementById('adjustmentEndDate');
     const suggestionList = document.getElementById('suggestionList');
-    const adjustmentForm = document.getElementById('adjustmentForm');
-    const adjustmentProduct = document.getElementById('adjustmentProduct');
-    const adjustmentProductId = document.getElementById('adjustmentProductId');
-    const adjustmentProductSuggestions = document.getElementById('adjustmentProductSuggestions');
-    const adjustmentValue = document.getElementById('adjustmentValue');
-    const adjustmentReason = document.getElementById('adjustmentReason');
-    const adjustmentNotes = document.getElementById('adjustmentNotes');
-    const submitAdjustmentBtn = document.getElementById('submitAdjustmentBtn');
-    const cancelEditBtn = document.getElementById('cancelEditBtn');
-    const exportAdjustmentsCsvBtn = document.getElementById('exportAdjustmentsCsvBtn');
 
-    if (!adjustmentTable || !adjustmentSearch || !adjustmentStartDate || !adjustmentEndDate || !suggestionList ||
-        !adjustmentForm || !adjustmentProduct || !adjustmentProductId || !adjustmentProductSuggestions ||
-        !adjustmentValue || !adjustmentReason || !adjustmentNotes || !submitAdjustmentBtn || !cancelEditBtn ||
-        !exportAdjustmentsCsvBtn) {
-        console.error('Required Stock Adjustments elements are missing');
+    // Debug: Log if elements are missing
+    if (!adjustmentTable) console.error('adjustmentTable element not found');
+    if (!adjustmentSearch) console.error('adjustmentSearch element not found');
+    if (!adjustmentStartDate) console.error('adjustmentStartDate element not found');
+    if (!adjustmentEndDate) console.error('adjustmentEndDate element not found');
+    if (!suggestionList) console.error('suggestionList element not found');
+
+    // Exit if critical elements are missing
+    if (!adjustmentTable || !adjustmentSearch || !suggestionList) {
+        console.error('Required DOM elements missing, cannot initialize Stock Adjustments.');
         return;
     }
 
-    // Autocomplete for search
+
+
+// Add exportStockAdjustmentsCsv function
+
+
+// Add Export CSV button event listener
+document.getElementById('exportStockAdjustmentsCsvBtn')?.addEventListener('click', exportStockAdjustmentsCsv);
+
+    // Autocomplete logic
     adjustmentSearch.addEventListener('input', async () => {
         const term = adjustmentSearch.value;
         suggestionList.style.display = term.length >= 2 ? 'block' : 'none';
@@ -2185,8 +3610,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch(`api.php?action=get_product_suggestions&term=${encodeURIComponent(term)}`);
             if (!response.ok) throw new Error('Network error');
             const products = await response.json();
-            suggestionList.innerHTML = products.map(p => `<li class="list-group-item">${p}</li>`).join('');
-            document.querySelectorAll('#suggestionList .list-group-item').forEach(item => {
+            suggestionList.innerHTML = products.map(p => `<li class="list-group-item suggestion-item">${p}</li>`).join('');
+            document.querySelectorAll('.suggestion-item').forEach(item => {
                 item.addEventListener('click', () => {
                     adjustmentSearch.value = item.textContent;
                     suggestionList.style.display = 'none';
@@ -2195,148 +3620,339 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         } catch (error) {
             console.error('Autocomplete error:', error);
-            if (typeof logError === 'function') {
-                logError('Autocomplete error in stock adjustments search: ' + error.message);
-            }
         }
     });
 
-    // Autocomplete for product selection in form
-    adjustmentProduct.addEventListener('input', async () => {
-        const term = adjustmentProduct.value;
-        adjustmentProductSuggestions.style.display = term.length >= 2 ? 'block' : 'none';
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+        if (adjustmentSearch && suggestionList && 
+            !adjustmentSearch.contains(e.target) && 
+            !suggestionList.contains(e.target)) {
+            suggestionList.style.display = 'none';
+        }
+    });
+
+    adjustmentSearch.addEventListener('input', fetchStockAdjustments);
+    adjustmentStartDate.addEventListener('change', fetchStockAdjustments);
+    adjustmentEndDate.addEventListener('change', fetchStockAdjustments);
+
+    // Initial fetch
+    fetchStockAdjustments();
+});
+
+
+
+document.getElementById('fetchForecastBtn')?.addEventListener('click', fetchForecast);
+
+// Initialize Sales Forecasting section when shown
+document.querySelector('.nav-link[data-section="sales-forecasting"]')?.addEventListener('click', () => {
+    fetchForecast();
+});
+
+function positionSuggestions(inputElement, suggestionsElement) {
+    const rect = inputElement.getBoundingClientRect();
+    const parentRect = inputElement.closest('.input-group').getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    suggestionsElement.style.width = `${parentRect.width}px`;
+    suggestionsElement.style.left = `${parentRect.left + window.pageXOffset}px`;
+    suggestionsElement.style.top = `${parentRect.bottom + scrollTop}px`;
+}
+
+// Call this whenever the input is focused or window is resized
+customerSearchBar.addEventListener('focus', () => {
+    positionSuggestions(customerSearchBar, customerSuggestions);
+});
+productSearchBar.addEventListener('focus', () => {
+    positionSuggestions(productSearchBar, productSuggestions);
+});
+window.addEventListener('resize', () => {
+    if (customerSuggestions.style.display === 'block') {
+        positionSuggestions(customerSearchBar, customerSuggestions);
+    }
+    if (productSuggestions.style.display === 'block') {
+        positionSuggestions(productSearchBar, productSuggestions);
+    }
+});
+// Event Listeners
+    document.getElementById('refreshLowStockBtn').addEventListener('click', fetchLowStockProducts);
+    fetchSalesReportBtn.addEventListener('click', fetchSalesReport);
+    exportSalesCsvBtn.addEventListener('click', exportSalesCsv);
+    exportSalesPdfBtn.addEventListener('click', exportSalesPdf);
+    fetchMostSoldBtn.addEventListener('click', fetchMostSoldProducts);
+    exportMostSoldCsvBtn.addEventListener('click', exportMostSoldCsv);
+    document.getElementById('exportStockAdjustmentsCsvBtn')?.addEventListener('click', exportStockAdjustmentsCsv);
+    productSearch.addEventListener('input', fetchProducts);
+    productCategoryFilter.addEventListener('change', fetchProducts);
+    searchProductsBtn.addEventListener('click', fetchProducts);
+    resetFiltersBtn.addEventListener('click', () => {
+        productSearch.value = '';
+        productCategoryFilter.value = '';
+        fetchProducts();
+    });
+    customerSearchBar.addEventListener('input', searchCustomers);
+    removeCustomerBtn.addEventListener('click', () => {
+        customerId = null;
+        selectedCustomerInfo.style.display = 'none';
+        loyaltyPointsToUse.value = 0;
+        updateCartTable();
+    });
+    
+    
+    checkoutBtn.addEventListener('click', checkout);
+    productForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const id = productIdInput.value;
+        const action = id ? 'update_product' : 'add_product';
+        const payload = {
+            action: action,
+            id: id || null,
+            name: productNameInput.value,
+            category_id: productCategoryInput.value,
+            price: parseFloat(productPriceInput.value),
+            quantity: parseInt(productQuantityInput.value),
+            barcode: productBarcodeInput.value,
+            image_url: document.getElementById('productImage').value,
+            description: document.getElementById('productDescription').value,
+            csrf_token: csrfToken
+        };
+        fetch('api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert(id ? 'Product updated successfully.' : 'Product added successfully.');
+                    productModal.hide();
+                    productForm.reset();
+                    productIdInput.value = '';
+                    productModalLabel.textContent = 'Add Product';
+                    fetchInventory();
+                    fetchLowStockProducts();
+                } else {
+                    alert('Error saving product: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                logError('Error saving product: ' + error.message);
+                alert('Error saving product: ' + error.message);
+            });
+    });
+    document.getElementById('addProductBtn').addEventListener('click', () => {
+        productModalLabel.textContent = 'Add Product';
+        productForm.reset();
+        productIdInput.value = '';
+    });
+    discountForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const action = discountIdInput.value ? 'update_discount' : 'add_discount';
+        const id = discountIdInput.value ? parseInt(discountIdInput.value) : null;
+        const payload = {
+            action: action,
+            id: id,
+            name: discountNameInput.value,
+            type: discountTypeInput.value,
+            value: parseFloat(discountValueInput.value),
+            min_purchase_amount: discountMinPurchaseInput.value ? parseFloat(discountMinPurchaseInput.value) : null,
+            product_id: discountProductInput.value || null,
+            category_id: discountCategoryInput.value || null,
+            start_date: discountStartDateInput.value.replace('T', ' '),
+            end_date: discountEndDateInput.value.replace('T', ' '),
+            is_active: discountIsActiveInput.checked,
+            csrf_token: csrfToken
+        };
+        fetch('api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    discountModal.hide();
+                    fetchDiscounts();
+                } else {
+                    throw new Error(data.message || 'Unknown error');
+                }
+            })
+            .catch(error => {
+                logError('Error saving discount: ' + error.message);
+                alert('Error saving discount: ' + error.message);
+            });
+    });
+    document.getElementById('addDiscountBtn').addEventListener('click', () => {
+        discountModalLabel.textContent = 'Add Discount';
+        discountForm.reset();
+        discountIdInput.value = '';
+    });
+    customerCreateForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const payload = {
+            action: 'add_customer',
+            username: document.getElementById('createUsername').value,
+            email: document.getElementById('createEmail').value,
+            first_name: document.getElementById('createFirstName').value || null,
+            last_name: document.getElementById('createLastName').value || null,
+            phone: document.getElementById('createPhone').value || null,
+            address: document.getElementById('createAddress').value || null,
+            csrf_token: csrfToken
+        };
+        fetch('api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Customer created successfully.');
+                    customerCreateModal.hide();
+                    customerCreateForm.reset();
+                    fetchCustomers();
+                } else {
+                    throw new Error(data.message || 'Unknown error');
+                }
+            })
+            .catch(error => {
+                logError('Error creating customer: ' + error.message);
+                alert('Error creating customer: ' + error.message);
+            });
+    });
+    customerEditForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const payload = {
+            action: 'update_customer',
+            id: document.getElementById('editCustomerId').value,
+            username: document.getElementById('editUsername').value,
+            email: document.getElementById('editEmail').value,
+            first_name: document.getElementById('editFirstName').value || null,
+            last_name: document.getElementById('editLastName').value || null,
+            phone: document.getElementById('editPhone').value || null,
+            address: document.getElementById('editAddress').value || null,
+            csrf_token: csrfToken
+        };
+        fetch('api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Customer updated successfully.');
+                    customerEditModal.hide();
+                    fetchCustomers();
+                } else {
+                    throw new Error(data.message || 'Unknown error');
+                }
+            })
+            .catch(error => {
+                logError('Error updating customer: ' + error.message);
+                alert('Error updating customer: ' + error.message);
+            });
+    });
+    let searchTimeout;
+    customerSearch.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        const query = customerSearch.value.trim();
+        if (query.length < 2) {
+            customerSuggestions.innerHTML = '';
+            customerSuggestions.style.display = 'none';
+            return;
+        }
+        searchTimeout = setTimeout(() => {
+            fetch(`api.php?action=get_all_customers&search=${encodeURIComponent(query)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    return response.json();
+                })
+                .then(data => {
+                    customerSuggestions.innerHTML = '';
+                    const customers = Array.isArray(data) ? data : [];
+                    if (customers.length > 0) {
+                        customers.forEach(customer => {
+                            const div = document.createElement('div');
+                            div.className = 'suggestion-item';
+                            div.textContent = `${customer.username} (${customer.email})`;
+                            div.addEventListener('click', () => {
+                                customerSearch.value = customer.username;
+                                customerSuggestions.innerHTML = '';
+                                customerSuggestions.style.display = 'none';
+                                fetchCustomers(customer.username);
+                            });
+                            customerSuggestions.appendChild(div);
+                        });
+                        customerSuggestions.style.display = 'block';
+                    } else {
+                        customerSuggestions.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    logError('Error searching customers: ' + error.message);
+                    customerSuggestions.style.display = 'none';
+                });
+        }, 300);
+    });
+
+
+    customerSearchBtn.addEventListener('click', () => {
+        fetchCustomers(customerSearch.value);
+    });
+    customerSearch.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            fetchCustomers(customerSearch.value);
+        }
+    });
+    adjustmentSearch.addEventListener('input', async () => {
+        const term = adjustmentSearch.value;
+        suggestionList.style.display = term.length >= 2 ? 'block' : 'none';
         if (term.length < 2) {
-            adjustmentProductSuggestions.innerHTML = '';
-            adjustmentProductId.value = '';
+            suggestionList.innerHTML = '';
             return;
         }
         try {
             const response = await fetch(`api.php?action=get_product_suggestions&term=${encodeURIComponent(term)}`);
             if (!response.ok) throw new Error('Network error');
             const products = await response.json();
-            adjustmentProductSuggestions.innerHTML = products.map(p => `<li class="list-group-item">${p}</li>`).join('');
-            document.querySelectorAll('#adjustmentProductSuggestions .list-group-item').forEach(item => {
+            suggestionList.innerHTML = products.map(p => `<li class="list-group-item suggestion-item">${p}</li>`).join('');
+            document.querySelectorAll('.suggestion-item').forEach(item => {
                 item.addEventListener('click', () => {
-                    adjustmentProduct.value = item.textContent;
-                    adjustmentProductSuggestions.style.display = 'none';
-                    fetch(`api.php?action=search_products&query=${encodeURIComponent(item.textContent)}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.products && data.products.length > 0) {
-                                adjustmentProductId.value = data.products[0].id;
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error fetching product ID:', error);
-                            if (typeof logError === 'function') {
-                                logError('Failed to fetch product ID for adjustment: ' + error.message);
-                            }
-                        });
+                    adjustmentSearch.value = item.textContent;
+                    suggestionList.style.display = 'none';
+                    fetchStockAdjustments();
                 });
             });
         } catch (error) {
-            console.error('Autocomplete error:', error);
-            if (typeof logError === 'function') {
-                logError('Autocomplete error in stock adjustments form: ' + error.message);
-            }
+            logError('Autocomplete error: ' + error.message);
         }
     });
-
-    // Hide suggestions when clicking outside
     document.addEventListener('click', (e) => {
         if (!adjustmentSearch.contains(e.target) && !suggestionList.contains(e.target)) {
             suggestionList.style.display = 'none';
         }
-        if (!adjustmentProduct.contains(e.target) && !adjustmentProductSuggestions.contains(e.target)) {
-            adjustmentProductSuggestions.style.display = 'none';
+        if (!customerSearch.contains(e.target) && !customerSuggestions.contains(e.target)) {
+            customerSuggestions.style.display = 'none';
         }
     });
-
-    // Form submission for add/edit
-    // Form submission for add/edit
-// Form submission for add/edit
-// Form submission for add/edit
-// Form submission for add/edit
-adjustmentForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    submitAdjustmentBtn.disabled = true; // Disable the button to prevent double submission
-
-    const product_id = adjustmentProductId.value;
-    const adjustment_value = parseInt(adjustmentValue.value);
-    const reason_id = adjustmentReason.value;
-    const notes = adjustmentNotes.value;
-    const action = window.editingAdjustmentId ? 'update_stock_adjustment' : 'process_stock_adjustment';
-
-    if (!product_id || isNaN(adjustment_value) || adjustment_value === 0 || !reason_id) {
-        alert('Please fill in all required fields with valid values.');
-        submitAdjustmentBtn.disabled = false;
-        return;
-    }
-
-    const payload = {
-        action: action,
-        product_id: parseInt(product_id),
-        adjustment_value: adjustment_value,
-        reason_id: parseInt(reason_id),
-        notes: notes,
-        csrf_token: csrfToken
-    };
-    if (window.editingAdjustmentId) {
-        payload.id = window.editingAdjustmentId;
-    }
-
-    try {
-        const response = await fetch('api.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        const data = await response.json();
-        console.log('Process Stock Adjustment Response:', data);
-        if (data.success) {
-            alert(window.editingAdjustmentId ? 'Adjustment updated successfully!' : 'Adjustment added successfully!');
-            resetAdjustmentForm();
-            adjustmentStartDate.value = '';
-            adjustmentEndDate.value = '';
-            fetchStockAdjustments();
-        } else {
-            throw new Error(data.message || 'Failed to save adjustment');
-        }
-    } catch (error) {
-        console.error('Error saving adjustment:', error);
-        alert('Error saving adjustment: ' + error.message);
-        if (typeof logError === 'function') {
-            logError('Failed to save stock adjustment: ' + error.message);
-        }
-    } finally {
-        submitAdjustmentBtn.disabled = false; // Re-enable the button
-    }
-});
-
-    // Cancel edit
-    cancelEditBtn.addEventListener('click', resetAdjustmentForm);
-
-    // Export CSV
-    exportAdjustmentsCsvBtn.addEventListener('click', () => {
-        const start_date = adjustmentStartDate.value;
-        const end_date = adjustmentEndDate.value;
-        if (!start_date || !end_date) {
-            alert('Please select both start and end dates.');
-            return;
-        }
-        window.location.href = `api.php?action=export_adjustments_csv&start_date=${start_date}&end_date=${end_date}`;
-    });
-
-    // Bind filter inputs
     adjustmentSearch.addEventListener('input', fetchStockAdjustments);
     adjustmentStartDate.addEventListener('change', fetchStockAdjustments);
     adjustmentEndDate.addEventListener('change', fetchStockAdjustments);
-});
+    document.getElementById('fetchForecastBtn')?.addEventListener('click', fetchForecast);
 
-        // Initialize Dashboard
-        fetchDashboardSummary();
-        fetchDailySalesTrend();
-        fetchLowStockProducts();
+    // Initialize Dashboard
+    fetchDashboardSummary();
+    fetchDailySalesTrend();
+    fetchLowStockProducts();
 
     </script>
 </body>
