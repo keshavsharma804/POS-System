@@ -1,0 +1,73 @@
+% Defining the document class and basic setup
+\documentclass[12pt]{article}
+
+% Including necessary packages
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\usepackage{graphicx} % Required for including images
+
+% Configuring page geometry
+\geometry{a4paper, margin=1in}
+
+% Setting up header and footer with fancyhdr
+\setlength{\headheight}{42pt} % Fixing fancyhdr warning
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textbf{Point of Sale System}}
+\fancyhead[R]{\textbf{INVOICE}}
+\fancyfoot[C]{Page \thepage\ of \pageref{LastPage}}
+
+% Beginning the document
+\begin{document}
+
+% Centered logo and title
+\begin{center}
+    \includegraphics[width=0.3\textwidth]{assets/logo.png} % Including the logo
+    \vspace{0.5cm}
+    \Huge\textbf{INVOICE}
+\end{center}
+
+% Adding some vertical space
+\vspace{0.5cm}
+
+% Customer and invoice details in a table
+\begin{tabular}{ll}
+    \textbf{Invoice No:} & INVOICE_NUMBER \\
+    \textbf{Date:} & INVOICE_DATE \\
+    \textbf{Due Date:} & DUE_DATE \\
+    \textbf{Customer:} & CUSTOMER_NAME \\
+    \textbf{Address:} & CUSTOMER_ADDRESS \\
+    \textbf{City, State, ZIP:} & CUSTOMER_CITY_STATE_ZIP \\
+    \textbf{Email:} & CUSTOMER_EMAIL \\
+\end{tabular}
+
+% Adding some vertical space before the items table
+\vspace{1cm}
+
+% Items table with 4 columns: Description, Quantity, Unit Price, Total
+\begin{tabular}{|l|c|r|r|}
+    \hline
+    \textbf{Description} & \textbf{Quantity} & \textbf{Unit Price} & \textbf{Total} \\
+    \hline
+    INVOICE_ITEMS
+    \hline
+    \multicolumn{3}{|r|}{\textbf{Subtotal:}} & \$SUBTOTAL \\
+    \multicolumn{3}{|r|}{\textbf{Tax (TAX_RATE\%):}} & \$TAX_AMOUNT \\
+    \multicolumn{3}{|r|}{\textbf{Total Due:}} & \$TOTAL_DUE \\
+    \hline
+\end{tabular}
+
+% Adding some vertical space
+\vspace{1cm}
+
+% Thank you message
+\begin{center}
+    Thank you for your purchase!
+\end{center}
+
+% Ending the document
+\end{document}

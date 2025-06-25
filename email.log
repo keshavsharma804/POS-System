@@ -1,8 +1,0 @@
-[2025-06-04 04:46:58] Starting notification script at 2025-06-04 04:46:58
-[2025-06-04 04:47:01] Failed to send email to admin@example.com: SMTP Error: Could not authenticate.
-[2025-06-04 04:47:01] No sales found for client client1 on 2025-06-03.
-[2025-06-04 04:47:01] Finished notification script at 2025-06-04 04:47:01
-[2025-06-04 04:51:38] Starting notification script at 2025-06-04 04:51:38
-[2025-06-04 04:51:42] Email sent to admin@example.com with subject: Low Stock Alert - POS System
-[2025-06-04 04:51:42] No sales found for client client1 on 2025-06-03.
-[2025-06-04 04:51:42] Finished notification script at 2025-06-04 04:51:42

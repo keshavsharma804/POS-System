@@ -1,6 +1,42 @@
 <?php
 session_start();
+
+
+$DB_HOST = 'localhost';
+$DB_NAME = 'pos_demo';
+$DB_USER = 'root';
+$DB_PASS = 'pos_demo99';
+
+// SMTP Config
+$SMTP_HOST = 'smtp.gmail.com';
+$SMTP_PORT = 587;
+$SMTP_USER = '@gmail.com';
+$SMTP_PASS = 'rzdskzlryfyhlxhi';
+$SMTP_FROM = 'sharmakeshav364@gmail.com';
+$SMTP_SECURE = 'tls';
+
+// At the VERY TOP of config.php
+require __DIR__ . '/vendor/autoload.php';
+
+
+// Debug .env loading
+if (!file_exists(__DIR__ . '/.env')) {
+    die('.env file not found at: ' . __DIR__);
+}
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+try {
+    $dotenv->safeLoad();
+} catch (Exception $e) {
+    die('Dotenv error: ' . $e->getMessage());
+}
+
+// Debug output (temporary)
+error_log('SMTP_USER: ' . ($_ENV['SMTP_USER'] ?? 'Not loaded'));
+
 require_once 'vendor/autoload.php';
+
+define('DEMO_MODE', true);
 
 // Database connection
 try {
@@ -83,8 +119,93 @@ function validateCsrfToken($token) {
 }
 
 
+// function isRateLimited($email, $action='pwd_reset', $limit=3) {
+//     $key = "limit_{$action}_{$email}";
+//     $count = $_SESSION[$key] ?? 0;
+    
+//     if ($count >= $limit) {
+//         error_log("Rate limit exceeded for $email");
+//         return true;
+//     }
+    
+//     $_SESSION[$key] = $count + 1;
+//     return false;
+// }
 
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+function sendOtpEmail($to, $otp) {
+    $mail = new PHPMailer(true);
+    
+    try {
+        // Server settings (from .env or defaults)
+        $mail->isSMTP();
+        $mail->Host       = $_ENV['SMTP_HOST'] ?? 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $_ENV['SMTP_USER'] ?? ''; // Fail early if not set
+        $mail->Password   = $_ENV['SMTP_PASS'] ?? ''; // Fail early if not set
+        $mail->SMTPSecure = $_ENV['SMTP_SECURE'] ?? PHPMailer::ENCRYPTION_STARTTLS; // TLS by default
+        $mail->Port       = $_ENV['SMTP_PORT'] ?? 587; // 587 for TLS, 465 for SSL
+
+        // Validate critical .env settings
+        if (empty($mail->Username)) {
+            throw new Exception('SMTP_USER is not set in .env');
+        }
+        if (empty($mail->Password)) {
+            throw new Exception('SMTP_PASS is not set in .env');
+        }
+
+        // Recipients
+        $mail->setFrom($_ENV['SMTP_FROM'] ?? $mail->Username, 'POS System'); // Fallback to SMTP_USER
+        $mail->addAddress($to);
+
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = 'Your Password Reset OTP';
+        $mail->Body    = "
+            <h2>Password Reset Request</h2>
+            <p>Your OTP code is: <strong>$otp</strong></p>
+            <p>Valid for 15 minutes</p>
+        ";
+        $mail->AltBody = "Your OTP code is: $otp\nValid for 15 minutes";
+
+        $mail->send();
+        error_log("[SUCCESS] OTP sent to $to");
+        return true;
+    } catch (Exception $e) {
+        error_log("[FAILED] OTP to $to | Error: " . $e->getMessage());
+        return false;
+    }
+}
+
+
+function isRateLimited($email, $action = 'pwd_reset', $limit = 3, $window = 3600) {
+    global $pdo;
+    try {
+        $pdo->prepare("DELETE FROM rate_limits WHERE last_attempt < NOW() - INTERVAL ? SECOND")
+            ->execute([$window]);
+        $stmt = $pdo->prepare("SELECT attempt_count FROM rate_limits WHERE email = ? AND action = ?");
+        $stmt->execute([$email, $action]);
+        $record = $stmt->fetch();
+        if ($record && $record['attempt_count'] >= $limit) {
+            debugLog("Rate limit exceeded for $email ($action)", 'api_debug.log');
+            return true;
+        }
+        if ($record) {
+            $stmt = $pdo->prepare("UPDATE rate_limits SET attempt_count = attempt_count + 1, last_attempt = NOW() WHERE email = ? AND action = ?");
+            $stmt->execute([$email, $action]);
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO rate_limits (email, action, attempt_count, last_attempt) VALUES (?, ?, 1, NOW())");
+            $stmt->execute([$email, $action]);
+        }
+        return false;
+    } catch (PDOException $e) {
+        debugLog("Rate limit error: " . $e->getMessage(), 'api_debug.log');
+        return true;
+    }
+}
 
 
 function getLowStockThreshold() {
@@ -312,7 +433,17 @@ try {
     debugLog("Error creating sale_discounts table: " . $e->getMessage());
 }
 
-
+// Add OTP columns to users table if they don't exist
+try {
+    $pdo->exec("ALTER TABLE users 
+                ADD COLUMN reset_token VARCHAR(255) NULL,
+                ADD COLUMN reset_expires DATETIME NULL");
+    debugLog("Added OTP columns to users table");
+} catch (PDOException $e) {
+    if (strpos($e->getMessage(), 'Duplicate column name') === false) {
+        debugLog("Error adding OTP columns: " . $e->getMessage());
+    }
+}
 
 // Ensure min_purchase_amount column exists
 try {
@@ -422,8 +553,19 @@ function clearCachePattern($pattern) {
 
 
 function isAdmin() {
-    return isset($_SESSION['user_id']) && $_SESSION['is_admin'] == 1;
+    return isset($_SESSION['user_id']) && isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
 }
+
+function regenerateCsrfToken() {
+    $token = bin2hex(random_bytes(32));
+    $_SESSION['csrf_token'] = $token;
+    return $token;
+}
+
+function verifyCsrfToken($token) {
+    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
 
 function getCsrfToken() {
     if (empty($_SESSION['csrf_token'])) {
